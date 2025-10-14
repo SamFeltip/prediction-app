@@ -101,7 +101,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
 
       await db.insert(userPoints).values({
         userId: bet.userId,
-        points: Math.max(0, currentPoints - totalWinningPoints),
+        points: currentPoints - totalWinningPoints,
       });
     }
 

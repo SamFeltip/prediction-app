@@ -24,7 +24,7 @@ export default async function ProfilePage() {
   const userPointsRecord = await db.query.userPoints.findFirst({
     where: eq(userPoints.userId, session.user.id),
   });
-  const currentUserPoints = userPointsRecord?.points ?? 1000;
+  const currentUserPoints = userPointsRecord?.points;
 
   // Get user's bets
   const userBets = await db

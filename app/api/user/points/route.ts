@@ -19,11 +19,14 @@ export async function GET() {
       where: eq(userPoints.userId, session.user.id),
     });
 
-    const points = result?.points ?? 1000;
+    const points = result?.points;
 
     return NextResponse.json({ points });
   } catch (error) {
     console.error("[v0] Error fetching user points:", error);
-    return NextResponse.json({ error: "Failed to fetch points" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch points" },
+      { status: 500 }
+    );
   }
 }
