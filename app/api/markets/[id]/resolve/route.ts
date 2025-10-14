@@ -84,7 +84,11 @@ export async function POST(request: NextRequest, context: RouteContext) {
         where: eq(userPoints.userId, bet.userId),
       });
 
-      const currentPoints = userPointsRecord?.points ?? 0;
+      if (userPointsRecord === undefined) {
+        continue;
+      }
+
+      const currentPoints = userPointsRecord.points;
 
       await db.insert(userPoints).values({
         userId: bet.userId,
@@ -97,7 +101,11 @@ export async function POST(request: NextRequest, context: RouteContext) {
         where: eq(userPoints.userId, bet.userId),
       });
 
-      const currentPoints = userPointsRecord?.points ?? 0;
+      if (userPointsRecord === undefined) {
+        continue;
+      }
+
+      const currentPoints = userPointsRecord.points;
 
       await db.insert(userPoints).values({
         userId: bet.userId,

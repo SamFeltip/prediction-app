@@ -119,6 +119,6 @@ export const userPoints = pgTable("user_points", {
   userId: text("user_id")
     .primaryKey()
     .references(() => user.id, { onDelete: "cascade" }),
-  points: integer("points").default(1000),
+  points: integer("points").default(1000).notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
