@@ -92,9 +92,9 @@ export function CreateMarketForm({ onSuccess }: CreateMarketFormProps) {
         <Input
           id="deadline"
           name="deadline"
-          type="date"
+          type="datetime-local"
           required
-          min={new Date().toISOString().slice(0, 10)}
+          min={new Date().toISOString().slice(0, 14)}
         />
       </div>
 
