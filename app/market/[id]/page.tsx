@@ -1,42 +1,54 @@
-import { notFound } from "next/navigation"
-import { sql } from "@/lib/db"
-import { MarketDetail } from "@/components/market-detail"
-import { BettingInterface } from "@/components/betting-interface"
-import { MarketBets } from "@/components/market-bets"
-import { MarketResolution } from "@/components/market-resolution"
-import Link from "next/link"
-import { ArrowLeft } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { notFound } from "next/navigation";
+import { db } from "@/lib/db";
+import { MarketDetail } from "@/components/market-detail";
+import { BettingInterface } from "@/components/betting-interface";
+import { MarketBets } from "@/components/market-bets";
+import { MarketResolution } from "@/components/market-resolution";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { eq, countDistinct, sql } from "drizzle-orm";
+import { markets, bets } from "@/lib/schema";
 
 interface MarketPageProps {
-  params: Promise<{ id: string }>
+  params: Promise<{ id: string }>;
 }
 
 export default async function MarketPage({ params }: MarketPageProps) {
-  const { id } = await params
-  const marketId = Number.parseInt(id)
+  const { id } = await params;
+  const marketId = Number.parseInt(id);
 
   if (isNaN(marketId)) {
-    notFound()
+    notFound();
   }
 
-  const markets = await sql`
-    SELECT 
-      m.*,
-      COALESCE(SUM(CASE WHEN b.prediction = true THEN b.points END), 0) as yes_points,
-      COALESCE(SUM(CASE WHEN b.prediction = false THEN b.points END), 0) as no_points,
-      COUNT(DISTINCT b.id) as bet_count
-    FROM markets m
-    LEFT JOIN bets b ON m.id = b.market_id
-    WHERE m.id = ${marketId}
-    GROUP BY m.id
-  `
+  const marketResults = await db
+    .select()
+    .from(markets)
+    .where(eq(markets.id, marketId))
+    .limit(1);
 
-  if (markets.length === 0) {
-    notFound()
+  const b = await db.select().from(bets).where(eq(bets.marketId, marketId));
+
+  const predictFalse = b.filter((bet) => bet.prediction === false).length;
+  const predictTrue = b.filter((bet) => bet.prediction === true).length;
+  // const marketResults = await db
+  //   .select({
+  //     ...markets,
+  //     yesPoints: sql<number>`coalesce(sum(case when ${bets.prediction} = true then ${bets.points} end), 0)`,
+  //     noPoints: sql<number>`coalesce(sum(case when ${bets.prediction} = false then ${bets.points} end), 0)`,
+  //     betCount: countDistinct(bets.id),
+  //   })
+  //   .from(markets)
+  //   .leftJoin(bets, eq(markets.id, bets.marketId))
+  //   .where(eq(markets.id, marketId))
+  //   .groupBy(markets.id);
+
+  if (marketResults.length === 0) {
+    notFound();
   }
 
-  const market = markets[0]
+  const market = marketResults[0];
 
   return (
     <div className="min-h-screen bg-background">
@@ -50,7 +62,11 @@ export default async function MarketPage({ params }: MarketPageProps) {
 
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2 space-y-6">
-            <MarketDetail market={market} />
+            <MarketDetail
+              market={market}
+              yesPoints={predictTrue}
+              noPoints={predictFalse}
+            />
             <MarketResolution market={market} />
             <MarketBets marketId={marketId} />
           </div>
@@ -61,5 +77,5 @@ export default async function MarketPage({ params }: MarketPageProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,54 +1,51 @@
-import { redirect } from "next/navigation"
-import { auth } from "@/lib/auth"
-import { headers } from "next/headers"
-import { sql } from "@/lib/db"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Coins, TrendingUp, Trophy, ArrowLeft } from "lucide-react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
+import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { db } from "@/lib/db";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Coins, TrendingUp, Trophy, ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { eq } from "drizzle-orm";
+import { userPoints, bets, markets } from "@/lib/schema";
 
 export default async function ProfilePage() {
   const session = await auth.api.getSession({
     headers: await headers(),
-  })
+  });
 
   if (!session) {
-    redirect("/auth/signin")
+    redirect("/auth/signin");
   }
 
   // Get user points
-  const pointsResult = await sql`
-    SELECT points FROM user_points WHERE user_id = ${session.user.id}
-  `
-  const userPoints = pointsResult[0]?.points ?? 1000
+  const userPointsRecord = await db.query.userPoints.findFirst({
+    where: eq(userPoints.userId, session.user.id),
+  });
+  const currentUserPoints = userPointsRecord?.points ?? 1000;
 
   // Get user's bets
-  const userBets = await sql`
-    SELECT 
-      b.*,
-      m.title,
-      m.resolved,
-      m.outcome
-    FROM bets b
-    JOIN markets m ON b.market_id = m.id
-    WHERE b.user_id = ${session.user.id}
-    ORDER BY b.created_at DESC
-  `
+  const userBets = await db
+    .select()
+    .from(bets)
+    .where(eq(bets.userId, session.user.id))
+    .leftJoin(markets, eq(bets.marketId, markets.id))
+    .orderBy(bets.createdAt);
 
   // Calculate stats
-  const totalBets = userBets.length
-  const resolvedBets = userBets.filter((bet: any) => bet.resolved)
-  const wonBets = resolvedBets.filter((bet: any) => bet.prediction === bet.outcome)
-  const winRate = resolvedBets.length > 0 ? Math.round((wonBets.length / resolvedBets.length) * 100) : 0
+  const totalBets = userBets.length;
+  const resolvedBets = userBets.filter((bet) => bet.markets?.resolved);
+  const wonBets = resolvedBets.filter((bet) => bet.bets.prediction === bet.markets?.outcome);
+  const winRate = resolvedBets.length > 0 ? Math.round((wonBets.length / resolvedBets.length) * 100) : 0;
 
   const initials =
     session.user.name
       ?.split(" ")
       .map((n) => n[0])
       .join("")
-      .toUpperCase() || "U"
+      .toUpperCase() || "U";
 
   return (
     <div className="min-h-screen bg-background">
@@ -83,7 +80,7 @@ export default async function ProfilePage() {
                     <Coins className="h-5 w-5 text-primary" />
                     <span className="font-medium">Points</span>
                   </div>
-                  <span className="text-2xl font-bold">{userPoints}</span>
+                  <span className="text-2xl font-bold">{currentUserPoints}</span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -112,33 +109,33 @@ export default async function ProfilePage() {
                 <p className="text-center text-muted-foreground">No bets placed yet</p>
               ) : (
                 <div className="space-y-3">
-                  {userBets.map((bet: any) => (
+                  {userBets.map((bet) => (
                     <Link
-                      key={bet.id}
-                      href={`/market/${bet.market_id}`}
+                      key={bet.bets.id}
+                      href={`/market/${bet.bets.marketId}`}
                       className="block rounded-lg border border-border p-4 transition-colors hover:border-primary/50"
                     >
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1">
-                          <h3 className="font-medium line-clamp-1">{bet.title}</h3>
+                          <h3 className="font-medium line-clamp-1">{bet.markets?.title}</h3>
                           <p className="text-sm text-muted-foreground">
-                            {new Date(bet.created_at).toLocaleDateString()}
+                            {new Date(bet.bets.createdAt).toLocaleDateString()}
                           </p>
                         </div>
                         <div className="flex items-center gap-3">
-                          <span className="font-medium">{bet.points} pts</span>
+                          <span className="font-medium">{bet.bets.points} pts</span>
                           <Badge
-                            variant={bet.prediction ? "default" : "destructive"}
+                            variant={bet.bets.prediction ? "default" : "destructive"}
                             className="min-w-[50px] justify-center"
                           >
-                            {bet.prediction ? "YES" : "NO"}
+                            {bet.bets.prediction ? "YES" : "NO"}
                           </Badge>
-                          {bet.resolved && (
+                          {bet.markets?.resolved && (
                             <Badge
-                              variant={bet.prediction === bet.outcome ? "default" : "secondary"}
+                              variant={bet.bets.prediction === bet.markets?.outcome ? "default" : "secondary"}
                               className="min-w-[60px] justify-center"
                             >
-                              {bet.prediction === bet.outcome ? "WON" : "LOST"}
+                              {bet.bets.prediction === bet.markets?.outcome ? "WON" : "LOST"}
                             </Badge>
                           )}
                         </div>
@@ -152,5 +149,5 @@ export default async function ProfilePage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

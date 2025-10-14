@@ -1,32 +1,34 @@
-import { sql } from "@/lib/db"
-import { MarketCard } from "@/components/market-card"
+import { db } from "@/lib/db";
+import { MarketCard } from "@/components/market-card";
+import { eq, countDistinct, sql } from "drizzle-orm";
+import { markets, bets } from "@/lib/schema";
 
 export async function MarketList() {
-  const markets = await sql`
-    SELECT 
-      m.*,
-      COUNT(DISTINCT b.id) as bet_count,
-      COALESCE(SUM(CASE WHEN b.prediction = true THEN b.points END), 0) as yes_points,
-      COALESCE(SUM(CASE WHEN b.prediction = false THEN b.points END), 0) as no_points
-    FROM markets m
-    LEFT JOIN bets b ON m.id = b.market_id
-    GROUP BY m.id
-    ORDER BY m.resolved ASC, m.created_at DESC
-  `
+  const marketStats = await db
+    .select({
+      ...markets,
+      betCount: countDistinct(bets.id),
+      yesPoints: sql<number>`coalesce(sum(case when ${bets.prediction} = true then ${bets.points} end), 0)`,
+      noPoints: sql<number>`coalesce(sum(case when ${bets.prediction} = false then ${bets.points} end), 0)`,
+    })
+    .from(markets)
+    .leftJoin(bets, eq(markets.id, bets.marketId))
+    .groupBy(markets.id)
+    .orderBy(markets.resolved, markets.createdAt);
 
-  if (markets.length === 0) {
+  if (marketStats.length === 0) {
     return (
       <div className="rounded-lg border border-border bg-card p-12 text-center">
         <p className="text-muted-foreground">No active markets yet. Be the first to create one!</p>
       </div>
-    )
+    );
   }
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {markets.map((market: any) => (
+      {marketStats.map((market) => (
         <MarketCard key={market.id} market={market} />
       ))}
     </div>
-  )
+  );
 }

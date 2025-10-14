@@ -1,26 +1,24 @@
-import { sql } from "@/lib/db"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
+import { db } from "@/lib/db";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { eq } from "drizzle-orm";
+import { bets, users } from "@/lib/schema";
 
 interface MarketBetsProps {
-  marketId: number
+  marketId: number;
 }
 
 export async function MarketBets({ marketId }: MarketBetsProps) {
-  const bets = await sql`
-    SELECT 
-      b.*,
-      u.name,
-      u.email
-    FROM bets b
-    JOIN neon_auth.users_sync u ON b.user_id = u.id
-    WHERE b.market_id = ${marketId}
-    ORDER BY b.created_at DESC
-    LIMIT 50
-  `
+  const betDetails = await db
+    .select()
+    .from(bets)
+    .where(eq(bets.marketId, marketId))
+    .leftJoin(users, eq(bets.userId, users.id))
+    .orderBy(bets.createdAt)
+    .limit(50);
 
-  if (bets.length === 0) {
+  if (betDetails.length === 0) {
     return (
       <Card>
         <CardHeader>
@@ -30,46 +28,46 @@ export async function MarketBets({ marketId }: MarketBetsProps) {
           <p className="text-center text-muted-foreground">No bets placed yet. Be the first!</p>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Recent Bets ({bets.length})</CardTitle>
+        <CardTitle>Recent Bets ({betDetails.length})</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
-          {bets.map((bet: any) => {
+          {betDetails.map((betDetail) => {
             const initials =
-              bet.name
+              betDetail.users?.name
                 ?.split(" ")
                 .map((n: string) => n[0])
                 .join("")
-                .toUpperCase() || "U"
+                .toUpperCase() || "U";
 
             return (
-              <div key={bet.id} className="flex items-center justify-between rounded-lg border border-border p-3">
+              <div key={betDetail.bets.id} className="flex items-center justify-between rounded-lg border border-border p-3">
                 <div className="flex items-center gap-3">
                   <Avatar className="h-8 w-8">
                     <AvatarFallback className="text-xs">{initials}</AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="font-medium">{bet.name || "Anonymous"}</p>
-                    <p className="text-xs text-muted-foreground">{new Date(bet.created_at).toLocaleDateString()}</p>
+                    <p className="font-medium">{betDetail.users?.name || "Anonymous"}</p>
+                    <p className="text-xs text-muted-foreground">{new Date(betDetail.bets.createdAt).toLocaleDateString()}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="font-medium">{bet.points} pts</span>
-                  <Badge variant={bet.prediction ? "default" : "destructive"} className="min-w-[50px] justify-center">
-                    {bet.prediction ? "YES" : "NO"}
+                  <span className="font-medium">{betDetail.bets.points} pts</span>
+                  <Badge variant={betDetail.bets.prediction ? "default" : "destructive"} className="min-w-[50px] justify-center">
+                    {betDetail.bets.prediction ? "YES" : "NO"}
                   </Badge>
                 </div>
               </div>
-            )
+            );
           })}
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

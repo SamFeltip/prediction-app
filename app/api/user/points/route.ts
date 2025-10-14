@@ -1,27 +1,29 @@
-import { NextResponse } from "next/server"
-import { sql } from "@/lib/db"
-import { auth } from "@/lib/auth"
-import { headers } from "next/headers"
+import { NextResponse } from "next/server";
+import { db } from "@/lib/db";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { eq } from "drizzle-orm";
+import { userPoints } from "@/lib/schema";
 
 export async function GET() {
   try {
     const session = await auth.api.getSession({
       headers: await headers(),
-    })
+    });
 
     if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const result = await sql`
-      SELECT points FROM user_points WHERE user_id = ${session.user.id}
-    `
+    const result = await db.query.userPoints.findFirst({
+      where: eq(userPoints.userId, session.user.id),
+    });
 
-    const points = result[0]?.points ?? 1000
+    const points = result?.points ?? 1000;
 
-    return NextResponse.json({ points })
+    return NextResponse.json({ points });
   } catch (error) {
-    console.error("[v0] Error fetching user points:", error)
-    return NextResponse.json({ error: "Failed to fetch points" }, { status: 500 })
+    console.error("[v0] Error fetching user points:", error);
+    return NextResponse.json({ error: "Failed to fetch points" }, { status: 500 });
   }
 }
