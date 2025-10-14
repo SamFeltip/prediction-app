@@ -1,0 +1,156 @@
+import { redirect } from "next/navigation"
+import { auth } from "@/lib/auth"
+import { headers } from "next/headers"
+import { sql } from "@/lib/db"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import { Coins, TrendingUp, Trophy, ArrowLeft } from "lucide-react"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+
+export default async function ProfilePage() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  })
+
+  if (!session) {
+    redirect("/auth/signin")
+  }
+
+  // Get user points
+  const pointsResult = await sql`
+    SELECT points FROM user_points WHERE user_id = ${session.user.id}
+  `
+  const userPoints = pointsResult[0]?.points ?? 1000
+
+  // Get user's bets
+  const userBets = await sql`
+    SELECT 
+      b.*,
+      m.title,
+      m.resolved,
+      m.outcome
+    FROM bets b
+    JOIN markets m ON b.market_id = m.id
+    WHERE b.user_id = ${session.user.id}
+    ORDER BY b.created_at DESC
+  `
+
+  // Calculate stats
+  const totalBets = userBets.length
+  const resolvedBets = userBets.filter((bet: any) => bet.resolved)
+  const wonBets = resolvedBets.filter((bet: any) => bet.prediction === bet.outcome)
+  const winRate = resolvedBets.length > 0 ? Math.round((wonBets.length / resolvedBets.length) * 100) : 0
+
+  const initials =
+    session.user.name
+      ?.split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase() || "U"
+
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8">
+        <Button variant="ghost" asChild className="mb-6">
+          <Link href="/">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Markets
+          </Link>
+        </Button>
+
+        <div className="grid gap-6 lg:grid-cols-3">
+          {/* Profile Card */}
+          <Card className="lg:col-span-1">
+            <CardHeader>
+              <CardTitle>Profile</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="flex flex-col items-center gap-4">
+                <Avatar className="h-24 w-24">
+                  <AvatarFallback className="bg-primary text-3xl text-primary-foreground">{initials}</AvatarFallback>
+                </Avatar>
+                <div className="text-center">
+                  <h2 className="text-2xl font-bold">{session.user.name}</h2>
+                  <p className="text-sm text-muted-foreground">{session.user.email}</p>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex items-center justify-between rounded-lg bg-primary/10 p-4">
+                  <div className="flex items-center gap-2">
+                    <Coins className="h-5 w-5 text-primary" />
+                    <span className="font-medium">Points</span>
+                  </div>
+                  <span className="text-2xl font-bold">{userPoints}</span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="rounded-lg bg-secondary p-4 text-center">
+                    <TrendingUp className="mx-auto mb-2 h-5 w-5 text-muted-foreground" />
+                    <p className="text-2xl font-bold">{totalBets}</p>
+                    <p className="text-xs text-muted-foreground">Total Bets</p>
+                  </div>
+                  <div className="rounded-lg bg-secondary p-4 text-center">
+                    <Trophy className="mx-auto mb-2 h-5 w-5 text-muted-foreground" />
+                    <p className="text-2xl font-bold">{winRate}%</p>
+                    <p className="text-xs text-muted-foreground">Win Rate</p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Betting History */}
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle>Betting History</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {userBets.length === 0 ? (
+                <p className="text-center text-muted-foreground">No bets placed yet</p>
+              ) : (
+                <div className="space-y-3">
+                  {userBets.map((bet: any) => (
+                    <Link
+                      key={bet.id}
+                      href={`/market/${bet.market_id}`}
+                      className="block rounded-lg border border-border p-4 transition-colors hover:border-primary/50"
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1">
+                          <h3 className="font-medium line-clamp-1">{bet.title}</h3>
+                          <p className="text-sm text-muted-foreground">
+                            {new Date(bet.created_at).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span className="font-medium">{bet.points} pts</span>
+                          <Badge
+                            variant={bet.prediction ? "default" : "destructive"}
+                            className="min-w-[50px] justify-center"
+                          >
+                            {bet.prediction ? "YES" : "NO"}
+                          </Badge>
+                          {bet.resolved && (
+                            <Badge
+                              variant={bet.prediction === bet.outcome ? "default" : "secondary"}
+                              className="min-w-[60px] justify-center"
+                            >
+                              {bet.prediction === bet.outcome ? "WON" : "LOST"}
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  )
+}

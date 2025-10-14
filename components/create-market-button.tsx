@@ -1,0 +1,51 @@
+"use client"
+
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Plus } from "lucide-react"
+import { CreateMarketForm } from "@/components/create-market-form"
+import { useSession } from "@/lib/auth-client"
+import { useRouter } from "next/navigation"
+
+export function CreateMarketButton() {
+  const [open, setOpen] = useState(false)
+  const { data: session } = useSession()
+  const router = useRouter()
+
+  if (!session) {
+    return (
+      <Button onClick={() => router.push("/auth/signin")}>
+        <Plus className="mr-2 h-4 w-4" />
+        Create Market
+      </Button>
+    )
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button>
+          <Plus className="mr-2 h-4 w-4" />
+          Create Market
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[525px]">
+        <DialogHeader>
+          <DialogTitle>Create New Market</DialogTitle>
+          <DialogDescription>
+            Create a binary prediction market. You'll resolve it when the deadline passes.
+          </DialogDescription>
+        </DialogHeader>
+        <CreateMarketForm onSuccess={() => setOpen(false)} />
+      </DialogContent>
+    </Dialog>
+  )
+}
