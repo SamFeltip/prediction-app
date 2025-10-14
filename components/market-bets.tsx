@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { eq } from "drizzle-orm";
-import { bets, users } from "@/lib/schema";
+import { bets, user } from "@/lib/schema";
 
 interface MarketBetsProps {
   marketId: number;
@@ -14,7 +14,7 @@ export async function MarketBets({ marketId }: MarketBetsProps) {
     .select()
     .from(bets)
     .where(eq(bets.marketId, marketId))
-    .leftJoin(users, eq(bets.userId, users.id))
+    .leftJoin(user, eq(bets.userId, user.id))
     .orderBy(bets.createdAt)
     .limit(50);
 
@@ -42,7 +42,7 @@ export async function MarketBets({ marketId }: MarketBetsProps) {
         <div className="space-y-3">
           {betDetails.map((betDetail) => {
             const initials =
-              betDetail.users?.name
+              betDetail.user?.name
                 ?.split(" ")
                 .map((n: string) => n[0])
                 .join("")
@@ -61,7 +61,7 @@ export async function MarketBets({ marketId }: MarketBetsProps) {
                   </Avatar>
                   <div>
                     <p className="font-medium">
-                      {betDetail.users?.name || "Anonymous"}
+                      {betDetail.user?.name || "Anonymous"}
                     </p>
                     <p className="text-xs text-muted-foreground">
                       {betDetail.bets.createdAt &&

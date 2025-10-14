@@ -48,11 +48,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check user has enough points
-    const userPointsRecord = await db.query.userPoints.findFirst({
-      where: eq(userPoints.userId, session.user.id),
-    });
-
     // Check if user already bet on this market
     const existingBet = await db.query.bets.findFirst({
       where: and(eq(bets.userId, session.user.id), eq(bets.marketId, marketId)),

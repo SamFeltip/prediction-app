@@ -1,9 +1,11 @@
 import { betterAuth } from "better-auth";
-import { neon, Pool } from "@neondatabase/serverless";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
+
+import { db } from "@/lib/db";
 
 export const auth = betterAuth({
-  database: new Pool({
-    connectionString: process.env.DATABASE_URL!,
+  database: drizzleAdapter(db, {
+    provider: "pg",
   }),
   emailAndPassword: {
     enabled: true,

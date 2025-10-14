@@ -30,7 +30,6 @@ export function BettingInterface({
   const router = useRouter();
   const { data: session } = useSession();
   const [prediction, setPrediction] = useState<boolean | null>(null);
-  const [points, setPoints] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -48,7 +47,7 @@ export function BettingInterface({
   const canBet = !market.resolved && !isExpired && session;
 
   async function handlePlaceBet() {
-    if (!session || prediction === null || !points) return;
+    if (!session || prediction === null) return;
 
     setLoading(true);
     setError("");
@@ -70,7 +69,6 @@ export function BettingInterface({
 
       // Reset form
       setPrediction(null);
-      setPoints("");
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
@@ -181,14 +179,7 @@ export function BettingInterface({
         <Button
           className="w-full"
           onClick={handlePlaceBet}
-          disabled={
-            loading ||
-            !canBet ||
-            prediction === null ||
-            !points ||
-            Number.parseInt(points) <= 0 ||
-            Number.parseInt(points) > userPoints
-          }
+          disabled={loading || !canBet || prediction === null}
         >
           {loading ? "Placing Bet..." : "Place Bet"}
         </Button>
