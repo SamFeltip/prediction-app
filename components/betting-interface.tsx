@@ -60,7 +60,6 @@ export function BettingInterface({
         body: JSON.stringify({
           marketId: market.id,
           prediction,
-          points: Number.parseInt(points),
         }),
       });
 
@@ -173,40 +172,6 @@ export function BettingInterface({
           </div>
         </div>
 
-        {/* Points Input */}
-        <div className="space-y-2">
-          <Label htmlFor="points">Points to Stake</Label>
-          <Input
-            id="points"
-            type="number"
-            min="1"
-            max={userPoints}
-            value={points}
-            onChange={(e) => setPoints(e.target.value)}
-            placeholder="Enter points"
-          />
-          <div className="flex gap-2">
-            {[10, 50, 100].map((amount) => (
-              <Button
-                key={amount}
-                variant="outline"
-                size="sm"
-                onClick={() => setPoints(amount.toString())}
-                disabled={amount > userPoints}
-              >
-                {amount}
-              </Button>
-            ))}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPoints(userPoints.toString())}
-            >
-              All In
-            </Button>
-          </div>
-        </div>
-
         {error && (
           <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
             {error}
@@ -218,6 +183,7 @@ export function BettingInterface({
           onClick={handlePlaceBet}
           disabled={
             loading ||
+            !canBet ||
             prediction === null ||
             !points ||
             Number.parseInt(points) <= 0 ||

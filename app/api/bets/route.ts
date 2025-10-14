@@ -16,69 +16,60 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { marketId, prediction, points } = body;
+    const { marketId, prediction } = body;
 
-    if (typeof marketId !== "number" || typeof prediction !== "boolean" || typeof points !== "number") {
-      return NextResponse.json({ error: "Invalid request data" }, { status: 400 });
+    if (typeof marketId !== "number" || typeof prediction !== "boolean") {
+      return NextResponse.json(
+        { error: "Invalid request data" },
+        { status: 400 }
+      );
     }
 
-    if (points <= 0) {
-      return NextResponse.json({ error: "Points must be greater than 0" }, { status: 400 });
+    // Check if market exists and is not resolved
+    const market = await db.query.markets.findFirst({
+      where: eq(markets.id, marketId),
+    });
+
+    if (!market) {
+      return NextResponse.json({ error: "Market not found" }, { status: 404 });
     }
 
-    await db.transaction(async (tx) => {
-      // Check if market exists and is not resolved
-      const market = await tx.query.markets.findFirst({
-        where: eq(markets.id, marketId),
-      });
+    if (market.resolved) {
+      return NextResponse.json(
+        { error: "Market is already resolved" },
+        { status: 400 }
+      );
+    }
 
-      if (!market) {
-        return NextResponse.json({ error: "Market not found" }, { status: 404 });
-      }
+    if (new Date(market.deadline) < new Date()) {
+      return NextResponse.json(
+        { error: "Market deadline has passed" },
+        { status: 400 }
+      );
+    }
 
-      if (market.resolved) {
-        return NextResponse.json({ error: "Market is already resolved" }, { status: 400 });
-      }
+    // Check user has enough points
+    const userPointsRecord = await db.query.userPoints.findFirst({
+      where: eq(userPoints.userId, session.user.id),
+    });
 
-      if (new Date(market.deadline) < new Date()) {
-        return NextResponse.json({ error: "Market deadline has passed" }, { status: 400 });
-      }
+    // Check if user already bet on this market
+    const existingBet = await db.query.bets.findFirst({
+      where: and(eq(bets.userId, session.user.id), eq(bets.marketId, marketId)),
+    });
 
-      // Check user has enough points
-      const userPointsRecord = await tx.query.userPoints.findFirst({
-        where: eq(userPoints.userId, session.user.id),
-      });
+    if (existingBet) {
+      return NextResponse.json(
+        { error: "You have already bet on this market" },
+        { status: 400 }
+      );
+    }
 
-      const currentUserPoints = userPointsRecord?.points ?? 1000;
-
-      if (points > currentUserPoints) {
-        return NextResponse.json({ error: "Insufficient points" }, { status: 400 });
-      }
-
-      // Check if user already bet on this market
-      const existingBet = await tx.query.bets.findFirst({
-        where: and(eq(bets.userId, session.user.id), eq(bets.marketId, marketId)),
-      });
-
-      if (existingBet) {
-        return NextResponse.json({ error: "You have already bet on this market" }, { status: 400 });
-      }
-
-      // Place bet and deduct points
-      await tx.insert(bets).values({
-        marketId,
-        userId: session.user.id,
-        prediction,
-        points,
-      });
-
-      await tx.insert(userPoints).values({
-        userId: session.user.id,
-        points: currentUserPoints - points,
-      }).onConflictDoUpdate({
-        target: userPoints.userId,
-        set: { points: currentUserPoints - points },
-      });
+    // Place bet
+    await db.insert(bets).values({
+      marketId,
+      userId: session.user.id,
+      prediction,
     });
 
     return NextResponse.json({ success: true });

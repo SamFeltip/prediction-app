@@ -139,9 +139,6 @@ export default async function ProfilePage() {
                           </p>
                         </div>
                         <div className="flex items-center gap-3">
-                          <span className="font-medium">
-                            {bet.bets.points} pts
-                          </span>
                           <Badge
                             variant={
                               bet.bets.prediction ? "default" : "destructive"

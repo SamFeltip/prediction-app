@@ -25,12 +25,13 @@ export function MarketCard({
 }) {
   const market = marketWithBets;
 
-  const yes_points = marketWithBets.bets
-    ?.filter((bet) => bet?.prediction === true)
-    .reduce((sum, bet) => sum + (bet?.points || 0), 0);
-  const no_points = marketWithBets.bets
-    ?.filter((bet) => bet?.prediction === false)
-    .reduce((sum, bet) => sum + (bet?.points || 0), 0);
+  const yes_points = marketWithBets.bets?.filter(
+    (bet) => bet?.prediction === true
+  );
+
+  const no_points = marketWithBets.bets?.filter(
+    (bet) => bet?.prediction === false
+  );
   const betCount = marketWithBets.bets?.length || 0;
 
   const totalPoints = Number(yes_points) + Number(no_points);

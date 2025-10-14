@@ -30,75 +30,96 @@ export async function POST(request: NextRequest, context: RouteContext) {
     const { outcome } = body;
 
     if (typeof outcome !== "boolean") {
-      return NextResponse.json({ error: "Outcome must be true or false" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Outcome must be true or false" },
+        { status: 400 }
+      );
     }
 
-    await db.transaction(async (tx) => {
-      // Get market and verify creator
-      const market = await tx.query.markets.findFirst({
-        where: eq(markets.id, marketId),
+    // Get market and verify creator
+    const market = await db.query.markets.findFirst({
+      where: eq(markets.id, marketId),
+    });
+
+    if (!market) {
+      return NextResponse.json({ error: "Market not found" }, { status: 404 });
+    }
+
+    if (market.creatorId !== session.user.id) {
+      return NextResponse.json(
+        { error: "Only the creator can resolve this market" },
+        { status: 403 }
+      );
+    }
+
+    if (market.resolved) {
+      return NextResponse.json(
+        { error: "Market is already resolved" },
+        { status: 400 }
+      );
+    }
+
+    if (new Date(market.deadline) > new Date()) {
+      return NextResponse.json(
+        { error: "Cannot resolve before deadline" },
+        { status: 400 }
+      );
+    }
+
+    // Get all bets for this market
+    const allBets = await db.query.bets.findMany({
+      where: eq(bets.marketId, marketId),
+    });
+
+    // Calculate points distribution
+    const winningBets = allBets.filter((bet) => bet.prediction === outcome);
+    const losingBets = allBets.filter((bet) => bet.prediction !== outcome);
+
+    const totalLosingPoints = losingBets.length;
+    const totalWinningPoints = winningBets.length;
+
+    // Distribute points to winners proportionally
+    for (const bet of winningBets) {
+      const userPointsRecord = await db.query.userPoints.findFirst({
+        where: eq(userPoints.userId, bet.userId),
       });
 
-      if (!market) {
-        return NextResponse.json({ error: "Market not found" }, { status: 404 });
-      }
+      const currentPoints = userPointsRecord?.points ?? 1000;
 
-      if (market.creatorId !== session.user.id) {
-        return NextResponse.json({ error: "Only the creator can resolve this market" }, { status: 403 });
-      }
+      await db.insert(userPoints).values({
+        userId: bet.userId,
+        points: currentPoints + totalLosingPoints,
+      });
+    }
 
-      if (market.resolved) {
-        return NextResponse.json({ error: "Market is already resolved" }, { status: 400 });
-      }
-
-      if (new Date(market.deadline) > new Date()) {
-        return NextResponse.json({ error: "Cannot resolve before deadline" }, { status: 400 });
-      }
-
-      // Get all bets for this market
-      const allBets = await tx.query.bets.findMany({
-        where: eq(bets.marketId, marketId),
+    for (const bet of losingBets) {
+      const userPointsRecord = await db.query.userPoints.findFirst({
+        where: eq(userPoints.userId, bet.userId),
       });
 
-      // Calculate points distribution
-      const winningBets = allBets.filter((bet) => bet.prediction === outcome);
-      const losingBets = allBets.filter((bet) => bet.prediction !== outcome);
+      const currentPoints = userPointsRecord?.points ?? 1000;
 
-      const totalLosingPoints = losingBets.reduce((sum, bet) => sum + bet.points, 0);
-      const totalWinningPoints = winningBets.reduce((sum, bet) => sum + bet.points, 0);
+      await db.insert(userPoints).values({
+        userId: bet.userId,
+        points: Math.max(0, currentPoints - totalWinningPoints),
+      });
+    }
 
-      // Distribute points to winners proportionally
-      for (const bet of winningBets) {
-        const betPoints = bet.points;
-        // Winner gets their stake back plus proportional share of losing points
-        const winnings = totalWinningPoints > 0 ? Math.floor((betPoints / totalWinningPoints) * totalLosingPoints) : 0;
-        const totalReturn = betPoints + winnings;
-
-        const userPointsRecord = await tx.query.userPoints.findFirst({
-          where: eq(userPoints.userId, bet.userId),
-        });
-
-        const currentPoints = userPointsRecord?.points ?? 1000;
-
-        await tx.insert(userPoints).values({
-          userId: bet.userId,
-          points: currentPoints + totalReturn,
-        }).onConflictDoUpdate({
-          target: userPoints.userId,
-          set: { points: currentPoints + totalReturn },
-        });
-      }
-
-      // Mark the market as resolved
-      await tx.update(markets).set({
+    // Mark the market as resolved
+    await db
+      .update(markets)
+      .set({
         resolved: true,
         outcome,
-      }).where(eq(markets.id, marketId));
-    });
+      })
+      .where(eq(markets.id, marketId));
 
     return NextResponse.json({ success: true, outcome });
   } catch (error) {
     console.error("[v0] Error resolving market:", error);
-    return NextResponse.json({ error: "Failed to resolve market" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to resolve market" },
+      { status: 500 }
+    );
   }
 }

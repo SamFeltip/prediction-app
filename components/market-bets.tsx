@@ -70,9 +70,6 @@ export async function MarketBets({ marketId }: MarketBetsProps) {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="font-medium">
-                    {betDetail.bets.points} pts
-                  </span>
                   <Badge
                     variant={
                       betDetail.bets.prediction ? "default" : "destructive"
