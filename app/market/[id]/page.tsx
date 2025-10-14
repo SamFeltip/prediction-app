@@ -4,12 +4,13 @@ import { MarketDetail } from "@/components/market-detail";
 import { BettingInterface } from "@/components/betting-interface";
 import { MarketBets } from "@/components/market-bets";
 import { MarketResolution } from "@/components/market-resolution";
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { eq, countDistinct, sql } from "drizzle-orm";
-import { markets, bets } from "@/lib/schema";
+import { eq } from "drizzle-orm";
+import { markets } from "@/lib/schema";
 import { getBetCounts } from "@/lib/betting/betCounts";
+import { auth } from "@/lib/auth";
+import { EditMarket } from "@/components/edit-market";
+import { headers } from "next/headers";
+import { DeleteMarketButton } from "@/components/delete-market-button";
 
 interface MarketPageProps {
   params: Promise<{ id: string }>;
@@ -18,6 +19,12 @@ interface MarketPageProps {
 export default async function MarketPage({ params }: MarketPageProps) {
   const { id } = await params;
   const marketId = Number.parseInt(id);
+
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  const userId = session?.user?.id;
 
   if (isNaN(marketId)) {
     notFound();
@@ -36,6 +43,7 @@ export default async function MarketPage({ params }: MarketPageProps) {
   }
 
   const market = marketResults[0];
+  const isCreator = market.creatorId === userId;
 
   return (
     <div className="min-h-screen bg-background">
@@ -52,8 +60,9 @@ export default async function MarketPage({ params }: MarketPageProps) {
             <MarketBets marketId={marketId} />
           </div>
 
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 space-y-6">
             <BettingInterface market={market} />
+            {isCreator && <EditMarket market={market} />}
           </div>
         </div>
       </div>
