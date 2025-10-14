@@ -1,47 +1,57 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useSession } from "@/lib/auth-client"
-import { Coins } from "lucide-react"
-import useSWR from "swr"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useSession } from "@/lib/auth-client";
+import { Coins } from "lucide-react";
+import useSWR from "swr";
+import { InferSelectModel } from "drizzle-orm";
+import { markets } from "@/lib/schema";
 
-interface BettingInterfaceProps {
-  market: {
-    id: number
-    resolved: boolean
-    deadline: string
-  }
-}
+type BettingInterfaceProps = InferSelectModel<typeof markets>;
 
-const fetcher = (url: string) => fetch(url).then((r) => r.json())
+const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
-export function BettingInterface({ market }: BettingInterfaceProps) {
-  const router = useRouter()
-  const { data: session } = useSession()
-  const [prediction, setPrediction] = useState<boolean | null>(null)
-  const [points, setPoints] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
+export function BettingInterface({
+  market,
+}: {
+  market: BettingInterfaceProps;
+}) {
+  const router = useRouter();
+  const { data: session } = useSession();
+  const [prediction, setPrediction] = useState<boolean | null>(null);
+  const [points, setPoints] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const { data: pointsData } = useSWR(session ? "/api/user/points" : null, fetcher, {
-    refreshInterval: 5000,
-  })
+  const { data: pointsData } = useSWR(
+    session ? "/api/user/points" : null,
+    fetcher,
+    {
+      refreshInterval: 5000,
+    }
+  );
 
-  const userPoints = pointsData?.points ?? 0
+  const userPoints = pointsData?.points ?? 0;
 
-  const isExpired = new Date(market.deadline) < new Date()
-  const canBet = !market.resolved && !isExpired && session
+  const isExpired = new Date(market.deadline) < new Date();
+  const canBet = !market.resolved && !isExpired && session;
 
   async function handlePlaceBet() {
-    if (!session || prediction === null || !points) return
+    if (!session || prediction === null || !points) return;
 
-    setLoading(true)
-    setError("")
+    setLoading(true);
+    setError("");
 
     try {
       const response = await fetch("/api/bets", {
@@ -52,21 +62,21 @@ export function BettingInterface({ market }: BettingInterfaceProps) {
           prediction,
           points: Number.parseInt(points),
         }),
-      })
+      });
 
       if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || "Failed to place bet")
+        const data = await response.json();
+        throw new Error(data.error || "Failed to place bet");
       }
 
       // Reset form
-      setPrediction(null)
-      setPoints("")
-      router.refresh()
+      setPrediction(null);
+      setPoints("");
+      router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong")
+      setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
@@ -75,15 +85,20 @@ export function BettingInterface({ market }: BettingInterfaceProps) {
       <Card>
         <CardHeader>
           <CardTitle>Place Your Bet</CardTitle>
-          <CardDescription>Sign in to participate in this market</CardDescription>
+          <CardDescription>
+            Sign in to participate in this market
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <Button className="w-full" onClick={() => router.push("/auth/signin")}>
+          <Button
+            className="w-full"
+            onClick={() => router.push("/auth/signin")}
+          >
             Sign In to Bet
           </Button>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   if (market.resolved) {
@@ -91,10 +106,12 @@ export function BettingInterface({ market }: BettingInterfaceProps) {
       <Card>
         <CardHeader>
           <CardTitle>Market Resolved</CardTitle>
-          <CardDescription>This market has been resolved and betting is closed</CardDescription>
+          <CardDescription>
+            This market has been resolved and betting is closed
+          </CardDescription>
         </CardHeader>
       </Card>
-    )
+    );
   }
 
   if (isExpired) {
@@ -102,17 +119,21 @@ export function BettingInterface({ market }: BettingInterfaceProps) {
       <Card>
         <CardHeader>
           <CardTitle>Betting Closed</CardTitle>
-          <CardDescription>The deadline has passed. Awaiting resolution.</CardDescription>
+          <CardDescription>
+            The deadline has passed. Awaiting resolution.
+          </CardDescription>
         </CardHeader>
       </Card>
-    )
+    );
   }
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Place Your Bet</CardTitle>
-        <CardDescription>Choose your prediction and stake points</CardDescription>
+        <CardDescription>
+          Choose your prediction and stake points
+        </CardDescription>
       </CardHeader>
 
       <CardContent className="space-y-6">
@@ -131,14 +152,20 @@ export function BettingInterface({ market }: BettingInterfaceProps) {
           <div className="grid grid-cols-2 gap-3">
             <Button
               variant={prediction === true ? "default" : "outline"}
-              className={prediction === true ? "bg-accent hover:bg-accent/90" : ""}
+              className={
+                prediction === true ? "bg-accent hover:bg-accent/90" : ""
+              }
               onClick={() => setPrediction(true)}
             >
               YES
             </Button>
             <Button
               variant={prediction === false ? "default" : "outline"}
-              className={prediction === false ? "bg-destructive hover:bg-destructive/90" : ""}
+              className={
+                prediction === false
+                  ? "bg-destructive hover:bg-destructive/90"
+                  : ""
+              }
               onClick={() => setPrediction(false)}
             >
               NO
@@ -170,13 +197,21 @@ export function BettingInterface({ market }: BettingInterfaceProps) {
                 {amount}
               </Button>
             ))}
-            <Button variant="outline" size="sm" onClick={() => setPoints(userPoints.toString())}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPoints(userPoints.toString())}
+            >
               All In
             </Button>
           </div>
         </div>
 
-        {error && <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">{error}</div>}
+        {error && (
+          <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+            {error}
+          </div>
+        )}
 
         <Button
           className="w-full"
@@ -193,5 +228,5 @@ export function BettingInterface({ market }: BettingInterfaceProps) {
         </Button>
       </CardContent>
     </Card>
-  )
+  );
 }

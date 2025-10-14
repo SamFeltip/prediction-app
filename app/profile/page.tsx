@@ -37,8 +37,13 @@ export default async function ProfilePage() {
   // Calculate stats
   const totalBets = userBets.length;
   const resolvedBets = userBets.filter((bet) => bet.markets?.resolved);
-  const wonBets = resolvedBets.filter((bet) => bet.bets.prediction === bet.markets?.outcome);
-  const winRate = resolvedBets.length > 0 ? Math.round((wonBets.length / resolvedBets.length) * 100) : 0;
+  const wonBets = resolvedBets.filter(
+    (bet) => bet.bets.prediction === bet.markets?.outcome
+  );
+  const winRate =
+    resolvedBets.length > 0
+      ? Math.round((wonBets.length / resolvedBets.length) * 100)
+      : 0;
 
   const initials =
     session.user.name
@@ -66,11 +71,15 @@ export default async function ProfilePage() {
             <CardContent className="space-y-6">
               <div className="flex flex-col items-center gap-4">
                 <Avatar className="h-24 w-24">
-                  <AvatarFallback className="bg-primary text-3xl text-primary-foreground">{initials}</AvatarFallback>
+                  <AvatarFallback className="bg-primary text-3xl text-primary-foreground">
+                    {initials}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="text-center">
                   <h2 className="text-2xl font-bold">{session.user.name}</h2>
-                  <p className="text-sm text-muted-foreground">{session.user.email}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {session.user.email}
+                  </p>
                 </div>
               </div>
 
@@ -80,7 +89,9 @@ export default async function ProfilePage() {
                     <Coins className="h-5 w-5 text-primary" />
                     <span className="font-medium">Points</span>
                   </div>
-                  <span className="text-2xl font-bold">{currentUserPoints}</span>
+                  <span className="text-2xl font-bold">
+                    {currentUserPoints}
+                  </span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -106,7 +117,9 @@ export default async function ProfilePage() {
             </CardHeader>
             <CardContent>
               {userBets.length === 0 ? (
-                <p className="text-center text-muted-foreground">No bets placed yet</p>
+                <p className="text-center text-muted-foreground">
+                  No bets placed yet
+                </p>
               ) : (
                 <div className="space-y-3">
                   {userBets.map((bet) => (
@@ -117,25 +130,38 @@ export default async function ProfilePage() {
                     >
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1">
-                          <h3 className="font-medium line-clamp-1">{bet.markets?.title}</h3>
+                          <h3 className="font-medium line-clamp-1">
+                            {bet.markets?.title}
+                          </h3>
                           <p className="text-sm text-muted-foreground">
-                            {new Date(bet.bets.createdAt).toLocaleDateString()}
+                            {bet.bets.createdAt &&
+                              new Date(bet.bets.createdAt).toLocaleDateString()}
                           </p>
                         </div>
                         <div className="flex items-center gap-3">
-                          <span className="font-medium">{bet.bets.points} pts</span>
+                          <span className="font-medium">
+                            {bet.bets.points} pts
+                          </span>
                           <Badge
-                            variant={bet.bets.prediction ? "default" : "destructive"}
+                            variant={
+                              bet.bets.prediction ? "default" : "destructive"
+                            }
                             className="min-w-[50px] justify-center"
                           >
                             {bet.bets.prediction ? "YES" : "NO"}
                           </Badge>
                           {bet.markets?.resolved && (
                             <Badge
-                              variant={bet.bets.prediction === bet.markets?.outcome ? "default" : "secondary"}
+                              variant={
+                                bet.bets.prediction === bet.markets?.outcome
+                                  ? "default"
+                                  : "secondary"
+                              }
                               className="min-w-[60px] justify-center"
                             >
-                              {bet.bets.prediction === bet.markets?.outcome ? "WON" : "LOST"}
+                              {bet.bets.prediction === bet.markets?.outcome
+                                ? "WON"
+                                : "LOST"}
                             </Badge>
                           )}
                         </div>

@@ -25,7 +25,9 @@ export async function MarketBets({ marketId }: MarketBetsProps) {
           <CardTitle>Recent Bets</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-center text-muted-foreground">No bets placed yet. Be the first!</p>
+          <p className="text-center text-muted-foreground">
+            No bets placed yet. Be the first!
+          </p>
         </CardContent>
       </Card>
     );
@@ -47,19 +49,36 @@ export async function MarketBets({ marketId }: MarketBetsProps) {
                 .toUpperCase() || "U";
 
             return (
-              <div key={betDetail.bets.id} className="flex items-center justify-between rounded-lg border border-border p-3">
+              <div
+                key={betDetail.bets.id}
+                className="flex items-center justify-between rounded-lg border border-border p-3"
+              >
                 <div className="flex items-center gap-3">
                   <Avatar className="h-8 w-8">
-                    <AvatarFallback className="text-xs">{initials}</AvatarFallback>
+                    <AvatarFallback className="text-xs">
+                      {initials}
+                    </AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="font-medium">{betDetail.users?.name || "Anonymous"}</p>
-                    <p className="text-xs text-muted-foreground">{new Date(betDetail.bets.createdAt).toLocaleDateString()}</p>
+                    <p className="font-medium">
+                      {betDetail.users?.name || "Anonymous"}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {betDetail.bets.createdAt &&
+                        new Date(betDetail.bets.createdAt).toLocaleDateString()}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="font-medium">{betDetail.bets.points} pts</span>
-                  <Badge variant={betDetail.bets.prediction ? "default" : "destructive"} className="min-w-[50px] justify-center">
+                  <span className="font-medium">
+                    {betDetail.bets.points} pts
+                  </span>
+                  <Badge
+                    variant={
+                      betDetail.bets.prediction ? "default" : "destructive"
+                    }
+                    className="min-w-[50px] justify-center"
+                  >
                     {betDetail.bets.prediction ? "YES" : "NO"}
                   </Badge>
                 </div>

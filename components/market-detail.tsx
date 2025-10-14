@@ -1,30 +1,21 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar, TrendingUp, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { markets } from "@/lib/schema";
+import { InferSelectModel } from "drizzle-orm";
 
-interface MarketDetailProps {
-  market: {
-    id: number;
-    title: string;
-    description: string | null;
-    deadline: string;
-    resolved: boolean;
-    outcome: boolean | null;
-    yes_points: number;
-    no_points: number;
-    bet_count: number;
-    created_at: string;
-  };
-}
+type MarketDetailProps = InferSelectModel<typeof markets>;
 
 export function MarketDetail({
   market,
   yesPoints,
   noPoints,
+  betCount,
 }: {
   market: MarketDetailProps;
   yesPoints: number;
   noPoints: number;
+  betCount: number;
 }) {
   const totalPoints = Number(yesPoints) + Number(noPoints);
   const yesPercentage =
@@ -96,7 +87,7 @@ export function MarketDetail({
               <Users className="h-4 w-4" />
               <span>Total Bets</span>
             </div>
-            <p className="text-2xl font-bold">{market.bet_count}</p>
+            <p className="text-2xl font-bold">{betCount}</p>
           </div>
 
           <div className="space-y-1">

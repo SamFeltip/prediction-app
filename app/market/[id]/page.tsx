@@ -9,6 +9,7 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { eq, countDistinct, sql } from "drizzle-orm";
 import { markets, bets } from "@/lib/schema";
+import { getBetCounts } from "@/lib/betting/betCounts";
 
 interface MarketPageProps {
   params: Promise<{ id: string }>;
@@ -28,21 +29,7 @@ export default async function MarketPage({ params }: MarketPageProps) {
     .where(eq(markets.id, marketId))
     .limit(1);
 
-  const b = await db.select().from(bets).where(eq(bets.marketId, marketId));
-
-  const predictFalse = b.filter((bet) => bet.prediction === false).length;
-  const predictTrue = b.filter((bet) => bet.prediction === true).length;
-  // const marketResults = await db
-  //   .select({
-  //     ...markets,
-  //     yesPoints: sql<number>`coalesce(sum(case when ${bets.prediction} = true then ${bets.points} end), 0)`,
-  //     noPoints: sql<number>`coalesce(sum(case when ${bets.prediction} = false then ${bets.points} end), 0)`,
-  //     betCount: countDistinct(bets.id),
-  //   })
-  //   .from(markets)
-  //   .leftJoin(bets, eq(markets.id, bets.marketId))
-  //   .where(eq(markets.id, marketId))
-  //   .groupBy(markets.id);
+  const { predictFalse, predictTrue, betCount } = await getBetCounts(marketId);
 
   if (marketResults.length === 0) {
     notFound();
@@ -66,6 +53,7 @@ export default async function MarketPage({ params }: MarketPageProps) {
               market={market}
               yesPoints={predictTrue}
               noPoints={predictFalse}
+              betCount={betCount}
             />
             <MarketResolution market={market} />
             <MarketBets marketId={marketId} />

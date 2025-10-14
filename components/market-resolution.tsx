@@ -1,58 +1,62 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { AlertCircle, CheckCircle, XCircle } from "lucide-react"
-import { useSession } from "@/lib/auth-client"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { AlertCircle, CheckCircle, XCircle } from "lucide-react";
+import { useSession } from "@/lib/auth-client";
+import { markets } from "@/lib/schema";
+import { InferSelectModel } from "drizzle-orm";
 
-interface MarketResolutionProps {
-  market: {
-    id: number
-    creator_id: string
-    resolved: boolean
-    outcome: boolean | null
-    deadline: string
-  }
-}
+type MarketResolutionProps = InferSelectModel<typeof markets>;
 
-export function MarketResolution({ market }: MarketResolutionProps) {
-  const router = useRouter()
-  const { data: session } = useSession()
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
+export function MarketResolution({
+  market,
+}: {
+  market: MarketResolutionProps;
+}) {
+  const router = useRouter();
+  const { data: session } = useSession();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const isCreator = session?.user.id === market.creator_id
-  const isExpired = new Date(market.deadline) < new Date()
-  const canResolve = isCreator && isExpired && !market.resolved
+  const isCreator = session?.user.id === market.creatorId;
+  const isExpired = new Date(market.deadline) < new Date();
+  const canResolve = isCreator && isExpired && !market.resolved;
 
   async function handleResolve(outcome: boolean) {
-    setLoading(true)
-    setError("")
+    setLoading(true);
+    setError("");
 
     try {
       const response = await fetch(`/api/markets/${market.id}/resolve`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ outcome }),
-      })
+      });
 
       if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || "Failed to resolve market")
+        const data = await response.json();
+        throw new Error(data.error || "Failed to resolve market");
       }
 
-      router.refresh()
+      router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong")
+      setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
   if (!isCreator) {
-    return null
+    return null;
   }
 
   if (market.resolved) {
@@ -64,11 +68,12 @@ export function MarketResolution({ market }: MarketResolutionProps) {
             Market Resolved
           </CardTitle>
           <CardDescription>
-            This market has been resolved as <strong>{market.outcome ? "YES" : "NO"}</strong>
+            This market has been resolved as{" "}
+            <strong>{market.outcome ? "YES" : "NO"}</strong>
           </CardDescription>
         </CardHeader>
       </Card>
-    )
+    );
   }
 
   if (!isExpired) {
@@ -80,11 +85,12 @@ export function MarketResolution({ market }: MarketResolutionProps) {
             Resolution Pending
           </CardTitle>
           <CardDescription>
-            You can resolve this market after the deadline passes on {new Date(market.deadline).toLocaleDateString()}
+            You can resolve this market after the deadline passes on{" "}
+            {new Date(market.deadline).toLocaleDateString()}
           </CardDescription>
         </CardHeader>
       </Card>
-    )
+    );
   }
 
   return (
@@ -92,14 +98,16 @@ export function MarketResolution({ market }: MarketResolutionProps) {
       <CardHeader>
         <CardTitle>Resolve Market</CardTitle>
         <CardDescription>
-          The deadline has passed. As the creator, you must decide the outcome of this market.
+          The deadline has passed. As the creator, you must decide the outcome
+          of this market.
         </CardDescription>
       </CardHeader>
 
       <CardContent className="space-y-4">
         <div className="rounded-lg bg-muted p-4">
           <p className="text-sm text-muted-foreground">
-            Choose the correct outcome. Winners will receive points equal to the total points staked by losers.
+            Choose the correct outcome. Winners will receive points equal to the
+            total points staked by losers.
           </p>
         </div>
 
@@ -130,8 +138,12 @@ export function MarketResolution({ market }: MarketResolutionProps) {
           </Button>
         </div>
 
-        {error && <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">{error}</div>}
+        {error && (
+          <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+            {error}
+          </div>
+        )}
       </CardContent>
     </Card>
-  )
+  );
 }
