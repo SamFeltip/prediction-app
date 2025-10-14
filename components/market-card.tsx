@@ -27,14 +27,16 @@ export function MarketCard({
 
   const yes_points = marketWithBets.bets?.filter(
     (bet) => bet?.prediction === true
-  );
+  ).length;
 
   const no_points = marketWithBets.bets?.filter(
     (bet) => bet?.prediction === false
-  );
+  ).length;
+
   const betCount = marketWithBets.bets?.length || 0;
 
   const totalPoints = Number(yes_points) + Number(no_points);
+
   const yesPercentage =
     totalPoints > 0 ? Math.round((Number(yes_points) / totalPoints) * 100) : 50;
 

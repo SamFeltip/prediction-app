@@ -65,10 +65,10 @@ export function MarketResolution({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <CheckCircle className="h-5 w-5 text-primary" />
-            Market Resolved
+            Wager Resolved
           </CardTitle>
           <CardDescription>
-            This market has been resolved as{" "}
+            This wager has been resolved as{" "}
             <strong>{market.outcome ? "YES" : "NO"}</strong>
           </CardDescription>
         </CardHeader>

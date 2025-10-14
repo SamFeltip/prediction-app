@@ -14,7 +14,7 @@ export async function MarketList() {
     return (
       <div className="rounded-lg border border-border bg-card p-12 text-center">
         <p className="text-muted-foreground">
-          No active markets yet. Be the first to create one!
+          No active wagers yet. Be the first to create one!
         </p>
       </div>
     );

@@ -43,7 +43,7 @@ export default async function MarketPage({ params }: MarketPageProps) {
         <Button variant="ghost" asChild className="mb-6">
           <Link href="/">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Markets
+            Back to Wagers
           </Link>
         </Button>
 

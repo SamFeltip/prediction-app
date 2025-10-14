@@ -101,9 +101,9 @@ export function BettingInterface({
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Market Resolved</CardTitle>
+          <CardTitle>Wager Resolved</CardTitle>
           <CardDescription>
-            This market has been resolved and betting is closed
+            This wager has been resolved and betting is closed
           </CardDescription>
         </CardHeader>
       </Card>
