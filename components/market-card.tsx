@@ -64,7 +64,7 @@ export function MarketCard({
       <CardContent className="flex-1 space-y-4">
         {/* Probability Bar */}
         {answers.map((answer) => (
-          <div className="space-y-2">
+          <div className="space-y-2" key={answer.id}>
             <div className="flex items-center justify-between text-sm">
               <span className="font-medium">{answer.title}</span>
             </div>

@@ -26,7 +26,7 @@ export function MarketResolution({ market }: { market: MarketWithBets }) {
   const isExpired = new Date(market.deadline) < new Date();
   const answer = market.resolvedAnswer && market.answers[market.resolvedAnswer];
 
-  async function handleResolve(outcome: boolean) {
+  async function handleResolve(chosenAnswerId: number) {
     setLoading(true);
     setError("");
 
@@ -34,7 +34,7 @@ export function MarketResolution({ market }: { market: MarketWithBets }) {
       const response = await fetch(`/api/markets/${market.id}/resolve`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ outcome }),
+        body: JSON.stringify({ answerId: chosenAnswerId }),
       });
 
       if (!response.ok) {
@@ -105,31 +105,20 @@ export function MarketResolution({ market }: { market: MarketWithBets }) {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <Button
-            size="lg"
-            className="h-20 bg-accent hover:bg-accent/90"
-            onClick={() => handleResolve(true)}
-            disabled={loading}
-          >
-            <div className="flex flex-col items-center gap-2">
-              <CheckCircle className="h-6 w-6" />
-              <span className="text-lg font-bold">YES</span>
-            </div>
-          </Button>
-
-          <Button
-            size="lg"
-            variant="destructive"
-            className="h-20"
-            onClick={() => handleResolve(false)}
-            disabled={loading}
-          >
-            <div className="flex flex-col items-center gap-2">
-              <XCircle className="h-6 w-6" />
-              <span className="text-lg font-bold">NO</span>
-            </div>
-          </Button>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {Object.values(market.answers).map((answer) => (
+            <Button
+              size="lg"
+              className="h-20 bg-accent hover:bg-accent/90"
+              onClick={() => handleResolve(answer.id)}
+              disabled={loading}
+            >
+              <div className="flex items-center gap-2">
+                <CheckCircle className="h-6 w-6" />
+                <span className="text-lg font-bold">{answer.title}</span>
+              </div>
+            </Button>
+          ))}
         </div>
 
         {error && (
