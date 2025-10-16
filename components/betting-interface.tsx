@@ -16,17 +16,12 @@ import { Coins } from "lucide-react";
 import useSWR from "swr";
 import { InferSelectModel } from "drizzle-orm";
 import { markets } from "@/lib/schema";
+import { MarketWithBets } from "@/lib/betting/betCounts";
 
-type BettingInterfaceProps = InferSelectModel<typeof markets>;
-
-export function BettingInterface({
-  market,
-}: {
-  market: BettingInterfaceProps;
-}) {
+export function BettingInterface({ market }: { market: MarketWithBets }) {
   const router = useRouter();
   const { data: session } = useSession();
-  const [prediction, setPrediction] = useState<boolean | null>(null);
+  const [prediction, setPrediction] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -45,7 +40,7 @@ export function BettingInterface({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           marketId: market.id,
-          prediction,
+          answerId: prediction,
         }),
       });
 
@@ -125,26 +120,14 @@ export function BettingInterface({
         <div className="space-y-2">
           <Label>Your Prediction</Label>
           <div className="grid grid-cols-2 gap-3">
-            <Button
-              variant={prediction === true ? "default" : "outline"}
-              className={
-                prediction === true ? "bg-accent hover:bg-accent/90" : ""
-              }
-              onClick={() => setPrediction(true)}
-            >
-              YES
-            </Button>
-            <Button
-              variant={prediction === false ? "default" : "outline"}
-              className={
-                prediction === false
-                  ? "bg-destructive hover:bg-destructive/90"
-                  : ""
-              }
-              onClick={() => setPrediction(false)}
-            >
-              NO
-            </Button>
+            {Object.values(market.answers).map((answer) => (
+              <Button
+                variant={prediction === answer.id ? "default" : "outline"}
+                onClick={() => setPrediction(answer.id)}
+              >
+                {answer.title}
+              </Button>
+            ))}
           </div>
         </div>
 

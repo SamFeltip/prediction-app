@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { and, eq } from "drizzle-orm";
-import { markets, bets, userPoints } from "@/lib/schema";
+import { markets, bets, userPoints, answers } from "@/lib/schema";
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,13 +16,9 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { marketId, prediction, answerId } = body;
+    const { marketId, answerId } = body;
 
-    if (
-      typeof marketId !== "number" ||
-      typeof prediction !== "boolean" ||
-      typeof answerId !== "number"
-    ) {
+    if (typeof marketId !== "number" || typeof answerId !== "number") {
       return NextResponse.json(
         { error: "Invalid request data" },
         { status: 400 }
@@ -64,8 +60,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const validAnswer = await db.query.bets.findFirst({
-      where: and(eq(bets.id, marketId), eq(bets.answerId, answerId)),
+    const validAnswer = await db.query.answers.findFirst({
+      where: and(eq(answers.marketId, marketId), eq(answers.id, answerId)),
     });
 
     if (!validAnswer) {
