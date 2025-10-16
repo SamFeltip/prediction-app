@@ -108,6 +108,7 @@ export function MarketResolution({ market }: { market: MarketWithBets }) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {Object.values(market.answers).map((answer) => (
             <Button
+              key={answer.id}
               size="lg"
               className="h-20 bg-accent hover:bg-accent/90"
               onClick={() => handleResolve(answer.id)}

@@ -59,7 +59,7 @@
   --color-muted: #1e293b;
   --color-muted-foreground: #94a3b8;
 
-  --color-accent: #10b981;
+  --color-accent: #10b981; /** todo: make blue */
   --color-accent-foreground: #ffffff;
 
   --color-destructive: #ef4444;

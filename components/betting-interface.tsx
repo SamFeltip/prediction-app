@@ -46,6 +46,7 @@ export function BettingInterface({ market }: { market: MarketWithBets }) {
 
       if (!response.ok) {
         const data = await response.json();
+        setPrediction(null);
         throw new Error(data.error || "Failed to place bet");
       }
 
@@ -122,6 +123,7 @@ export function BettingInterface({ market }: { market: MarketWithBets }) {
           <div className="grid grid-cols-2 gap-3">
             {Object.values(market.answers).map((answer) => (
               <Button
+                key={answer.id}
                 variant={prediction === answer.id ? "default" : "outline"}
                 onClick={() => setPrediction(answer.id)}
               >
