@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { and, countDistinct, eq, isNull, sum } from "drizzle-orm";
-import { markets, bets } from "@/lib/schema";
+import { markets, bets, answers } from "@/lib/schema";
 import { sql } from "drizzle-orm";
 
 // export async function GET() {
@@ -41,11 +41,11 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { title, description, deadline } = body;
+    const { title, description, deadline, answers: answersRequest } = body;
 
-    if (!title || !deadline) {
+    if (!title || !deadline || !answersRequest) {
       return NextResponse.json(
-        { error: "Title and deadline are required" },
+        { error: "Title and deadline and answers are required" },
         { status: 400 }
       );
     }
@@ -58,7 +58,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const newMarket = await db
+    if (
+      !Array.isArray(answersRequest) ||
+      answersRequest.length < 2 ||
+      answersRequest.some((answer) => typeof answer.title !== "string")
+    ) {
+      return NextResponse.json(
+        { error: "answersRequest were incorrect" },
+        { status: 404 }
+      );
+    }
+
+    const newMarketResult = await db
       .insert(markets)
       .values({
         title,
@@ -67,8 +78,18 @@ export async function POST(request: NextRequest) {
         deadline: deadlineDate,
       })
       .returning();
+    const newMarket = newMarketResult[0];
+    const newAnswers = await db
+      .insert(answers)
+      .values(
+        answersRequest.map((answer) => ({
+          title: answer.title,
+          marketId: newMarket.id,
+        }))
+      )
+      .returning();
 
-    return NextResponse.json({ market: newMarket[0] });
+    return NextResponse.json({ market: newMarket, answers: newAnswers });
   } catch (error) {
     console.error("[v0] Error creating market:", error);
     return NextResponse.json(
