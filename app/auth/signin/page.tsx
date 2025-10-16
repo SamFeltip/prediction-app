@@ -12,7 +12,7 @@ export default function SignInPage() {
             className="inline-flex items-center gap-2 text-2xl font-bold"
           >
             <TrendingUp className="h-8 w-8 text-primary" />
-            PredictHub
+            Predict
           </Link>
           <h2 className="mt-6 text-3xl font-bold text-foreground">
             Sign in to your account

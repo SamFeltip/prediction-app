@@ -10,7 +10,7 @@ export function Header() {
         <div className="flex items-center gap-2">
           <TrendingUp className="h-6 w-6 text-primary" />
           <h1 className="text-xl font-bold text-foreground">
-            <Link href="/">PredictHub</Link>
+            <Link href="/">Predict</Link>
           </h1>
         </div>
         <div className="flex items-center gap-4">

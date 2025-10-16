@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PredictHub - Binary Prediction Markets",
-  description: "Create and bet on binary prediction markets",
+  title: "Predict - Prediction Markets",
+  description: "Create and bet on wagers",
   generator: "v0.app",
 };
 
