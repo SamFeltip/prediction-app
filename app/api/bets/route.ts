@@ -16,9 +16,13 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { marketId, prediction } = body;
+    const { marketId, prediction, answerId } = body;
 
-    if (typeof marketId !== "number" || typeof prediction !== "boolean") {
+    if (
+      typeof marketId !== "number" ||
+      typeof prediction !== "boolean" ||
+      typeof answerId !== "number"
+    ) {
       return NextResponse.json(
         { error: "Invalid request data" },
         { status: 400 }
@@ -34,7 +38,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Market not found" }, { status: 404 });
     }
 
-    if (market.resolved) {
+    if (market.resolvedAnswer) {
       return NextResponse.json(
         { error: "Market is already resolved" },
         { status: 400 }
@@ -60,11 +64,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const validAnswer = await db.query.bets.findFirst({
+      where: and(eq(bets.id, marketId), eq(bets.answerId, answerId)),
+    });
+
+    if (!validAnswer) {
+      return NextResponse.json(
+        { error: "Invalid answer for this market" },
+        { status: 400 }
+      );
+    }
+
     // Place bet
     await db.insert(bets).values({
       marketId,
       userId: session.user.id,
-      prediction,
+      answerId: answerId,
     });
 
     return NextResponse.json({ success: true });

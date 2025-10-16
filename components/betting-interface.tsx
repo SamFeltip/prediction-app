@@ -19,8 +19,6 @@ import { markets } from "@/lib/schema";
 
 type BettingInterfaceProps = InferSelectModel<typeof markets>;
 
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
-
 export function BettingInterface({
   market,
 }: {
@@ -32,18 +30,8 @@ export function BettingInterface({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const { data: pointsData } = useSWR(
-    session ? "/api/user/points" : null,
-    fetcher,
-    {
-      refreshInterval: 5000,
-    }
-  );
-
-  const userPoints = pointsData?.points ?? 0;
-
   const isExpired = new Date(market.deadline) < new Date();
-  const canBet = !market.resolved && !isExpired && session;
+  const canBet = !market.resolvedAnswer && !isExpired && session;
 
   async function handlePlaceBet() {
     if (!session || prediction === null) return;
@@ -97,7 +85,7 @@ export function BettingInterface({
     );
   }
 
-  if (market.resolved) {
+  if (market.resolvedAnswer) {
     return (
       <Card>
         <CardHeader>
@@ -133,15 +121,6 @@ export function BettingInterface({
       </CardHeader>
 
       <CardContent className="space-y-6">
-        {/* User Points Display */}
-        <div className="flex items-center justify-between rounded-lg bg-secondary p-4">
-          <div className="flex items-center gap-2">
-            <Coins className="h-5 w-5 text-primary" />
-            <span className="font-medium">Your Points</span>
-          </div>
-          <span className="text-2xl font-bold">{userPoints}</span>
-        </div>
-
         {/* Prediction Selection */}
         <div className="space-y-2">
           <Label>Your Prediction</Label>

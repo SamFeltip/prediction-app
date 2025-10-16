@@ -10,36 +10,31 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, TrendingUp, Users } from "lucide-react";
 import Link from "next/link";
-import { markets, bets } from "@/lib/schema";
+import { markets, bets, answers } from "@/lib/schema";
 import { InferSelectModel } from "drizzle-orm";
+import { MarketWithBets } from "@/lib/betting/betCounts";
 
-type MarketModel = InferSelectModel<typeof markets>;
-type BetModel = InferSelectModel<typeof bets>;
-
-export type MarketWithBets = MarketModel & { bets: BetModel[] };
+export type MarketWithBetCount = InferSelectModel<typeof markets> & {
+  answers: Record<
+    number,
+    InferSelectModel<typeof answers> & { betCount: number }
+  >;
+};
 
 export function MarketCard({
   marketWithBets,
 }: {
-  marketWithBets: MarketWithBets;
+  marketWithBets: MarketWithBetCount;
 }) {
   const market = marketWithBets;
+  const answers = Object.values(marketWithBets.answers);
+  const points = answers.map((answer) => ({
+    [answer.id]: answer.betCount,
+  }));
 
-  const yes_points = marketWithBets.bets?.filter(
-    (bet) => bet?.prediction === true
-  ).length;
-
-  const no_points = marketWithBets.bets?.filter(
-    (bet) => bet?.prediction === false
-  ).length;
-
-  const betCount = marketWithBets.bets?.length || 0;
-
-  const totalPoints = Number(yes_points) + Number(no_points);
-
-  const yesPercentage =
-    totalPoints > 0 ? Math.round((Number(yes_points) / totalPoints) * 100) : 50;
-
+  const totalBets = answers.reduce((acc, answer) => acc + answer.betCount, 0);
+  const outcome =
+    market.resolvedAnswer && market.answers[market.resolvedAnswer];
   const deadline = new Date(market.deadline);
   const isExpired = deadline < new Date();
 
@@ -50,12 +45,12 @@ export function MarketCard({
           <h3 className="line-clamp-2 text-balance font-semibold leading-tight text-foreground">
             {market.title}
           </h3>
-          {market.resolved && (
+          {outcome && (
             <Badge
-              variant={market.outcome ? "default" : "destructive"}
+              variant={outcome ? "default" : "destructive"}
               className="shrink-0 text-xs"
             >
-              {market.outcome ? "YES" : "NO"}
+              {outcome.title}
             </Badge>
           )}
         </div>
@@ -68,32 +63,27 @@ export function MarketCard({
 
       <CardContent className="flex-1 space-y-4">
         {/* Probability Bar */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between text-sm">
-            <span className="font-medium text-accent">
-              Yes {yesPercentage}%
-            </span>
-            <span className="font-medium text-destructive">
-              No {100 - yesPercentage}%
-            </span>
+        {answers.map((answer) => (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-sm">
+              <span className="font-medium">{answer.title}</span>
+            </div>
+            <div className="h-2 overflow-hidden rounded-full bg-secondary">
+              <div
+                className="h-full bg-accent transition-all"
+                style={{
+                  width: `${totalBets == 0 ? 0 : answer.betCount / totalBets}`,
+                }}
+              />
+            </div>
           </div>
-          <div className="h-2 overflow-hidden rounded-full bg-secondary">
-            <div
-              className="h-full bg-accent transition-all"
-              style={{ width: `${yesPercentage}%` }}
-            />
-          </div>
-        </div>
+        ))}
 
         {/* Stats */}
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-1">
             <Users className="h-4 w-4" />
-            <span>{betCount} bets</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <TrendingUp className="h-4 w-4" />
-            <span>{totalPoints} pts</span>
+            <span>{totalBets} bets</span>
           </div>
         </div>
 
@@ -101,7 +91,11 @@ export function MarketCard({
         <div className="flex items-center gap-1 text-sm text-muted-foreground">
           <Calendar className="h-4 w-4" />
           <span className={isExpired ? "text-destructive" : ""}>
-            {market.resolved ? "Resolved" : isExpired ? "Expired" : "Ends"}{" "}
+            {market.resolvedAnswer
+              ? "Resolved"
+              : isExpired
+              ? "Expired"
+              : "Ends"}{" "}
             {deadline.toLocaleDateString()}
           </span>
         </div>
@@ -110,7 +104,7 @@ export function MarketCard({
       <CardFooter>
         <Button asChild className="w-full">
           <Link href={`/market/${market.id}`}>
-            {market.resolved
+            {market.resolvedAnswer
               ? "View Results"
               : isExpired
               ? "View Market"

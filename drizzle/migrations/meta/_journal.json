@@ -15,6 +15,27 @@
       "when": 1760463009651,
       "tag": "0001_parched_baron_zemo",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1760473839798,
+      "tag": "0002_nebulous_black_cat",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1760474380612,
+      "tag": "0003_clever_golden_guardian",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1760474520177,
+      "tag": "0004_faithful_stepford_cuckoos",
+      "breakpoints": true
     }
   ]
 }

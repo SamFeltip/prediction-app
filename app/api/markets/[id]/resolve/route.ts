@@ -2,8 +2,8 @@ import { type NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { eq } from "drizzle-orm";
-import { markets, bets, userPoints } from "@/lib/schema";
+import { and, eq } from "drizzle-orm";
+import { markets, bets, userPoints, answers } from "@/lib/schema";
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -27,11 +27,11 @@ export async function POST(request: NextRequest, context: RouteContext) {
     }
 
     const body = await request.json();
-    const { outcome } = body;
+    const { answerId } = body;
 
-    if (typeof outcome !== "boolean") {
+    if (typeof answerId !== "number") {
       return NextResponse.json(
-        { error: "Outcome must be true or false" },
+        { error: "answerId must be a valid id" },
         { status: 400 }
       );
     }
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
       );
     }
 
-    if (market.resolved) {
+    if (market.resolvedAnswer) {
       return NextResponse.json(
         { error: "Market is already resolved" },
         { status: 400 }
@@ -66,14 +66,25 @@ export async function POST(request: NextRequest, context: RouteContext) {
       );
     }
 
+    const validAnswer = await db.query.answers.findFirst({
+      where: and(eq(answers.id, answerId), eq(answers.marketId, marketId)),
+    });
+
+    if (!validAnswer) {
+      return NextResponse.json(
+        { error: "answerId must be a valid answer for this market" },
+        { status: 400 }
+      );
+    }
+
     // Get all bets for this market
     const allBets = await db.query.bets.findMany({
       where: eq(bets.marketId, marketId),
     });
 
     // Calculate points distribution
-    const winningBets = allBets.filter((bet) => bet.prediction === outcome);
-    const losingBets = allBets.filter((bet) => bet.prediction !== outcome);
+    const winningBets = allBets.filter((bet) => bet.answerId === answerId);
+    const losingBets = allBets.filter((bet) => bet.answerId !== answerId);
 
     const totalLosingPoints = losingBets.length;
     const totalWinningPoints = winningBets.length;
@@ -117,12 +128,11 @@ export async function POST(request: NextRequest, context: RouteContext) {
     await db
       .update(markets)
       .set({
-        resolved: true,
-        outcome,
+        resolvedAnswer: answerId,
       })
       .where(eq(markets.id, marketId));
 
-    return NextResponse.json({ success: true, outcome });
+    return NextResponse.json({ success: true, answerId });
   } catch (error) {
     console.error("[v0] Error resolving market:", error);
     return NextResponse.json(

@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { eq } from "drizzle-orm";
-import { bets, user } from "@/lib/schema";
+import { answers, bets, user } from "@/lib/schema";
 
 interface MarketBetsProps {
   marketId: number;
@@ -15,6 +15,7 @@ export async function MarketBets({ marketId }: MarketBetsProps) {
     .from(bets)
     .where(eq(bets.marketId, marketId))
     .leftJoin(user, eq(bets.userId, user.id))
+    .innerJoin(answers, eq(bets.answerId, answers.id))
     .orderBy(bets.createdAt)
     .limit(50);
 
@@ -71,12 +72,10 @@ export async function MarketBets({ marketId }: MarketBetsProps) {
                 </div>
                 <div className="flex items-center gap-3">
                   <Badge
-                    variant={
-                      betDetail.bets.prediction ? "default" : "destructive"
-                    }
+                    variant={"default"}
                     className="min-w-[50px] justify-center"
                   >
-                    {betDetail.bets.prediction ? "YES" : "NO"}
+                    {betDetail.answers.title}
                   </Badge>
                 </div>
               </div>

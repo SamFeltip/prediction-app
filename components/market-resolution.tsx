@@ -14,14 +14,9 @@ import { AlertCircle, CheckCircle, XCircle } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
 import { markets } from "@/lib/schema";
 import { InferSelectModel } from "drizzle-orm";
+import { MarketWithBets } from "@/lib/betting/betCounts";
 
-type MarketResolutionProps = InferSelectModel<typeof markets>;
-
-export function MarketResolution({
-  market,
-}: {
-  market: MarketResolutionProps;
-}) {
+export function MarketResolution({ market }: { market: MarketWithBets }) {
   const router = useRouter();
   const { data: session } = useSession();
   const [loading, setLoading] = useState(false);
@@ -29,7 +24,7 @@ export function MarketResolution({
 
   const isCreator = session?.user.id === market.creatorId;
   const isExpired = new Date(market.deadline) < new Date();
-  const canResolve = isCreator && isExpired && !market.resolved;
+  const answer = market.resolvedAnswer && market.answers[market.resolvedAnswer];
 
   async function handleResolve(outcome: boolean) {
     setLoading(true);
@@ -59,7 +54,7 @@ export function MarketResolution({
     return null;
   }
 
-  if (market.resolved) {
+  if (answer) {
     return (
       <Card className="border-primary/50">
         <CardHeader>
@@ -68,8 +63,7 @@ export function MarketResolution({
             Wager Resolved
           </CardTitle>
           <CardDescription>
-            This wager has been resolved as{" "}
-            <strong>{market.outcome ? "YES" : "NO"}</strong>
+            This wager has been resolved as <strong>{answer.title}</strong>
           </CardDescription>
         </CardHeader>
       </Card>

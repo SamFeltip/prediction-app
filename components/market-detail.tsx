@@ -3,23 +3,14 @@ import { Calendar, TrendingUp, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { markets } from "@/lib/schema";
 import { InferSelectModel } from "drizzle-orm";
+import { MarketWithBets } from "@/lib/betting/betCounts";
 
 type MarketDetailProps = InferSelectModel<typeof markets>;
 
-export function MarketDetail({
-  market,
-  yesPoints,
-  noPoints,
-  betCount,
-}: {
-  market: MarketDetailProps;
-  yesPoints: number;
-  noPoints: number;
-  betCount: number;
-}) {
-  const totalPoints = Number(yesPoints) + Number(noPoints);
-  const yesPercentage =
-    totalPoints > 0 ? Math.round((Number(yesPoints) / totalPoints) * 100) : 50;
+export function MarketDetail({ market }: { market: MarketWithBets }) {
+  const betCount = Object.values(market.answers).reduce((acc, x) => {
+    return acc + Object.keys(x.bets).length;
+  }, 0);
 
   const deadline = new Date(market.deadline);
   const isExpired = deadline < new Date();
@@ -31,15 +22,12 @@ export function MarketDetail({
           <CardTitle className="text-2xl text-balance leading-tight">
             {market.title}
           </CardTitle>
-          {market.resolved && (
-            <Badge
-              variant={market.outcome ? "default" : "destructive"}
-              className="shrink-0"
-            >
-              {market.outcome ? "Resolved: YES" : "Resolved: NO"}
+          {market.resolvedAnswer && (
+            <Badge variant={"default"} className="shrink-0">
+              {market.answers[market.resolvedAnswer].title}
             </Badge>
           )}
-          {!market.resolved && isExpired && (
+          {!market.resolvedAnswer && isExpired && (
             <Badge variant="secondary" className="shrink-0">
               Awaiting Resolution
             </Badge>
@@ -60,24 +48,27 @@ export function MarketDetail({
         {/* Probability Visualization */}
         <div className="space-y-3">
           <h3 className="text-sm font-medium text-muted-foreground">
-            {market.resolved ? "Final Result" : "Current Prediction"}
+            {market.resolvedAnswer ? "Final Result" : "Current Prediction"}
           </h3>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-2xl font-bold text-accent">
-                YES {yesPercentage}%
-              </span>
-              <span className="text-2xl font-bold text-destructive">
-                NO {100 - yesPercentage}%
-              </span>
+          {Object.values(market.answers).map((answer) => (
+            <div className="space-y-2" key={answer.id}>
+              <div className="flex items-center justify-between">
+                <span className="text-2xl font-bold ">{answer.title}</span>
+              </div>
+              <div className="h-3 overflow-hidden rounded-full bg-secondary">
+                <div
+                  className="h-full bg-accent transition-all"
+                  style={{
+                    width: `${
+                      betCount == 0
+                        ? 0
+                        : Object.values(answer.bets).length / betCount
+                    }`,
+                  }}
+                />
+              </div>
             </div>
-            <div className="h-3 overflow-hidden rounded-full bg-secondary">
-              <div
-                className="h-full bg-accent transition-all"
-                style={{ width: `${yesPercentage}%` }}
-              />
-            </div>
-          </div>
+          ))}
         </div>
 
         {/* Market Stats */}
@@ -88,14 +79,6 @@ export function MarketDetail({
               <span>Total Bets</span>
             </div>
             <p className="text-2xl font-bold">{betCount}</p>
-          </div>
-
-          <div className="space-y-1">
-            <div className="flex items-center gap-1 text-sm text-muted-foreground">
-              <TrendingUp className="h-4 w-4" />
-              <span>Total Points</span>
-            </div>
-            <p className="text-2xl font-bold">{totalPoints}</p>
           </div>
 
           <div className="space-y-1">

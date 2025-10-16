@@ -1,14 +1,57 @@
 import { db } from "@/lib/db";
-import { MarketCard, MarketWithBets } from "@/components/market-card";
-import { eq } from "drizzle-orm";
-import { markets, bets } from "@/lib/schema";
+import { MarketCard, MarketWithBetCount } from "@/components/market-card";
+import { count, countDistinct, eq, sql, sum } from "drizzle-orm";
+import { markets, bets, answers } from "@/lib/schema";
+import { MarketWithBets } from "@/lib/betting/betCounts";
+import { Description } from "@radix-ui/react-dialog";
 
 export async function MarketList() {
   const marketStats = await db
-    .select()
+    .select({
+      markets: { ...markets },
+      answers: { ...answers },
+      betCount: count(bets.id),
+    })
     .from(markets)
-    .leftJoin(bets, eq(markets.id, bets.marketId))
-    .orderBy(markets.resolved, markets.createdAt);
+    .leftJoin(answers, eq(markets.id, answers.marketId))
+    .leftJoin(bets, eq(answers.id, bets.answerId))
+    .groupBy(markets.id, answers.id)
+    .orderBy(markets.resolvedAnswer, markets.createdAt);
+
+  console.log(marketStats);
+
+  let marketResults: Record<number, MarketWithBetCount> = [];
+
+  marketStats.forEach((element) => {
+    const marketId = element.markets.id;
+    if (marketId in marketResults) {
+      if (element.answers === null) {
+        return;
+      }
+      const answerId = element.answers.id;
+      marketResults[marketId].answers[answerId] = {
+        ...element.answers,
+        betCount: element.betCount,
+      };
+    } else {
+      let s = element.markets;
+      if (element.answers == null) {
+        return;
+      }
+
+      marketResults[marketId] = {
+        ...element.markets,
+        answers: {
+          [element.answers.id]: {
+            ...element.answers,
+            betCount: element.betCount,
+          },
+        },
+      };
+    }
+  });
+
+  console.log(marketStats);
 
   if (marketStats.length === 0) {
     return (
@@ -20,28 +63,30 @@ export async function MarketList() {
     );
   }
 
-  const marketsWithBets = Object.values(
-    marketStats.reduce(
-      (acc: Record<number, MarketWithBets>, { markets, bets }) => {
-        // Ensure market exists in accumulator
-        if (!acc[markets.id]) {
-          acc[markets.id] = { ...markets, bets: [] };
-        }
+  // TODO: use betCounts code to get all markets with their answers and bets
 
-        // Push bet if present
-        if (bets && bets.id) {
-          acc[markets.id].bets.push(bets);
-        }
+  // const marketsWithBets = Object.values(
+  //   marketStats.reduce(
+  //     (acc: Record<number, MarketWithBetCount>, { markets, bets }) => {
+  //       // Ensure market exists in accumulator
+  //       if (!acc[markets.id]) {
+  //         acc[markets.id] = { ...markets, bets: [] };
+  //       }
 
-        return acc;
-      },
-      {}
-    )
-  );
+  //       // Push bet if present
+  //       if (bets && bets.id) {
+  //         acc[markets.id].bets.push(bets);
+  //       }
+
+  //       return acc;
+  //     },
+  //     {}
+  //   )
+  // );
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {marketsWithBets.map((marketWithBets) => {
+      {Object.values(marketResults).map((marketWithBets) => {
         return (
           <MarketCard key={marketWithBets.id} marketWithBets={marketWithBets} />
         );

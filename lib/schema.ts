@@ -80,15 +80,30 @@ export const markets = pgTable(
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
     deadline: timestamp("deadline", { withTimezone: true }).notNull(),
-    resolved: boolean("resolved").default(false),
-    outcome: boolean("outcome"),
+    resolvedAnswer: integer("resolved_answer"),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
   },
   (table) => ({
     creatorIdx: index("idx_markets_creator_id").on(table.creatorId),
     deadlineIdx: index("idx_markets_deadline").on(table.deadline),
-    resolvedIdx: index("idx_markets_resolved").on(table.resolved),
+    answerIdx: index("idx_answers_id").on(table.resolvedAnswer),
+  })
+);
+
+export const answers = pgTable(
+  "answers",
+  {
+    id: serial("id").primaryKey(),
+    title: text("title").notNull(),
+    marketId: integer("market_id")
+      .notNull()
+      .references(() => markets.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+  },
+  (table) => ({
+    marketIdx: index("idx_answers_market_id").on(table.marketId),
   })
 );
 
@@ -102,12 +117,15 @@ export const bets = pgTable(
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
-    prediction: boolean("prediction").notNull(),
+    answerId: integer("answer_id")
+      .notNull()
+      .references(() => answers.id, { onDelete: "cascade" }),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   },
   (table) => ({
     marketIdx: index("idx_bets_market_id").on(table.marketId),
     userIdx: index("idx_bets_user_id").on(table.userId),
+    answerIdx: index("idx_answer_markets_answer_id").on(table.answerId),
     userMarketIdx: uniqueIndex("idx_bets_user_market").on(
       table.userId,
       table.marketId
