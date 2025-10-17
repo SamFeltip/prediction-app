@@ -15,7 +15,7 @@ import { CreateMarketForm } from "@/components/create-market-form";
 import { useSession } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 
-export function CreateMarketButton() {
+export function CreateMarketButton({ roomId }: { roomId: number }) {
   const [open, setOpen] = useState(false);
   const { data: session } = useSession();
   const router = useRouter();
@@ -44,7 +44,7 @@ export function CreateMarketButton() {
             Create a wager. You'll resolve it when the deadline passes.
           </DialogDescription>
         </DialogHeader>
-        <CreateMarketForm onSuccess={() => setOpen(false)} />
+        <CreateMarketForm onSuccess={() => setOpen(false)} roomId={roomId} />
       </DialogContent>
     </Dialog>
   );

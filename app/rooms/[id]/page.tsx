@@ -12,7 +12,7 @@ export default function RoomDetailPage({ params }: { params: { id: string } }) {
         <div className="max-w-2xl mx-auto mt-10 flex flex-col gap-2">
           <div className="flex justify-between">
             <h2 className="text-2xl font-bold mb-4">Room {roomId}</h2>
-            <CreateMarketButton />
+            <CreateMarketButton roomId={roomId} />
           </div>
 
           <div className="flex justify-end">

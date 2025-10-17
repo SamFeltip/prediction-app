@@ -12,6 +12,7 @@ import { useSession } from "@/lib/auth-client";
 
 interface CreateMarketFormProps {
   onSuccess?: () => void;
+  roomId: number;
 }
 
 interface AnswerOption {
@@ -19,7 +20,7 @@ interface AnswerOption {
   title: string;
 }
 
-export function CreateMarketForm({ onSuccess }: CreateMarketFormProps) {
+export function CreateMarketForm({ onSuccess, roomId }: CreateMarketFormProps) {
   const router = useRouter();
   const { data: session } = useSession();
   const [loading, setLoading] = useState(false);
@@ -74,6 +75,7 @@ export function CreateMarketForm({ onSuccess }: CreateMarketFormProps) {
         body: JSON.stringify({
           title,
           description,
+          roomId,
           deadline: new Date(deadline).toISOString(),
           answers: trimmedAnswers.map((title) => ({ title })),
         }),

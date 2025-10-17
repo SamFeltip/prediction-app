@@ -41,9 +41,15 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { title, description, deadline, answers: answersRequest } = body;
+    const {
+      title,
+      description,
+      deadline,
+      roomId,
+      answers: answersRequest,
+    } = body;
 
-    if (!title || !deadline || !answersRequest) {
+    if (!title || !deadline || !answersRequest || !roomId) {
       return NextResponse.json(
         { error: "Title and deadline and answers are required" },
         { status: 400 }
@@ -74,6 +80,7 @@ export async function POST(request: NextRequest) {
       .values({
         title,
         description,
+        roomId,
         creatorId: session.user.id,
         deadline: deadlineDate,
       })

@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { eq } from "drizzle-orm";
 import { userPoints, bets, markets, answers } from "@/lib/schema";
 import { Header } from "@/components/Header";
+import RoomInvitations from "@/components/room-invitations";
 
 export default async function ProfilePage() {
   const session = await auth.api.getSession({
@@ -118,6 +119,12 @@ export default async function ProfilePage() {
                       </div>
                     </div>
                   </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent>
+                  <RoomInvitations />
                 </CardContent>
               </Card>
 

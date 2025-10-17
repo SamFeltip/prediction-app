@@ -34,5 +34,5 @@ export async function POST(req: Request) {
   await db
     .insert(userRooms)
     .values({ roomId: roomIdNum, userId: invitedUser.id, status: "pending" });
-  return new Response("User invited", { status: 201 });
+  return NextResponse.json({ message: "User invited" }, { status: 201 });
 }
