@@ -8,6 +8,7 @@ import {
   primaryKey,
   index,
   uniqueIndex,
+  pgEnum,
 } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
@@ -70,12 +71,40 @@ export const verification = pgTable("verification", {
     .notNull(),
 });
 
+export const userRoomInviteEnum = pgEnum("userRoomInvite", [
+  "pending",
+  "accepted",
+]);
+
+export const userRooms = pgTable("userRooms", {
+  id: serial("id").primaryKey(),
+  status: userRoomInviteEnum().default("pending").notNull(),
+  roomId: integer("room_id")
+    .notNull()
+    .references(() => rooms.id, { onDelete: "cascade" }),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+});
+
+export const rooms = pgTable("rooms", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  creator: integer("creator_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+});
+
 export const markets = pgTable(
   "markets",
   {
     id: serial("id").primaryKey(),
     title: text("title").notNull(),
     description: text("description"),
+    roomId: integer("room_id")
+      .notNull()
+      .default(1)
+      .references(() => rooms.id, { onDelete: "cascade" }),
     creatorId: text("creator_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),

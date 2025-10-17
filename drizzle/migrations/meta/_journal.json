@@ -36,6 +36,13 @@
       "when": 1760474520177,
       "tag": "0004_faithful_stepford_cuckoos",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1760708866524,
+      "tag": "0005_cheerful_sentinels",
+      "breakpoints": true
     }
   ]
 }
