@@ -31,6 +31,26 @@ export async function POST(req: Request) {
 
   const invitedUser = userResult[0];
 
+  const userRoomResult = await db
+    .select()
+    .from(userRooms)
+    .where(eq(userRooms.userId, invitedUser.id));
+  if (userRoomResult.length > 0) {
+    const userRoom = userRoomResult[0];
+
+    if (userRoom.status === "pending") {
+      return NextResponse.json(
+        { error: "User has already been invited" },
+        { status: 400 }
+      );
+    } else {
+      return NextResponse.json(
+        { error: "User is already in room" },
+        { status: 400 }
+      );
+    }
+  }
+
   await db
     .insert(userRooms)
     .values({ roomId: roomIdNum, userId: invitedUser.id, status: "pending" });

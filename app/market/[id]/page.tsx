@@ -56,7 +56,7 @@ export default async function MarketPage({ params }: MarketPageProps) {
                   href={`/rooms/${market.roomId}`}
                 >
                   <ArrowLeftCircle className="inline-block pe-2" />
-                  go back to room {market.roomId}
+                  go back to room {marketResult.rooms.title}
                 </a>
               </div>
               <div className="grid gap-6 lg:grid-cols-3">

@@ -1,6 +1,6 @@
 import { eq, InferSelectModel } from "drizzle-orm";
 import { db } from "../db";
-import { answers, bets, markets } from "../schema";
+import { answers, bets, markets, rooms } from "../schema";
 
 // export async function getBetCounts(marketId: number) {
 //   const b = await db.select().from(bets).where(eq(bets.marketId, marketId));
@@ -19,6 +19,7 @@ type AnswersWithBets = InferSelectModel<typeof answers> & {
 };
 
 export type MarketWithBets = InferSelectModel<typeof markets> & {
+  rooms: InferSelectModel<typeof rooms>;
   answers: Record<number, AnswersWithBets>;
 };
 
@@ -28,6 +29,7 @@ export async function getMarketWithBetsAndAnswers(
   const marketBets = await db
     .select()
     .from(markets)
+    .innerJoin(rooms, eq(rooms.id, markets.roomId))
     .leftJoin(answers, eq(markets.id, answers.marketId))
     .leftJoin(bets, eq(bets.answerId, answers.id))
     .where(eq(markets.id, marketId));
@@ -41,6 +43,7 @@ export async function getMarketWithBetsAndAnswers(
 
   const market: MarketWithBets = {
     ...marketBets[0].markets,
+    rooms: { ...marketBets[0].rooms },
     answers: {},
   };
 

@@ -12,6 +12,7 @@ import { eq } from "drizzle-orm";
 import { userPoints, bets, markets, answers } from "@/lib/schema";
 import { Header } from "@/components/Header";
 import RoomInvitations from "@/components/room-invitations";
+import { Suspense } from "react";
 
 export default async function ProfilePage() {
   const session = await auth.api.getSession({
@@ -70,7 +71,7 @@ export default async function ProfilePage() {
 
             <div className="grid gap-6 lg:grid-cols-3">
               {/* Profile Card */}
-              <Card className="lg:col-span-1">
+              <Card className="lg:col-span-2">
                 <CardHeader>
                   <CardTitle>Profile</CardTitle>
                 </CardHeader>
@@ -124,7 +125,9 @@ export default async function ProfilePage() {
 
               <Card>
                 <CardContent>
-                  <RoomInvitations />
+                  <Suspense fallback={<div>loading invites...</div>}>
+                    <RoomInvitations />
+                  </Suspense>
                 </CardContent>
               </Card>
 

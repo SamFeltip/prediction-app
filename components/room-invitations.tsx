@@ -1,46 +1,26 @@
 // Component to show and manage invitations in /profile
-"use client";
 import { useEffect, useState } from "react";
+import { InviteItem } from "./invite-item";
+import { db } from "@/lib/db";
+import { rooms, userRooms } from "@/lib/schema";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { eq, and } from "drizzle-orm";
 
-type Invite = {
-  invite: { id: number };
-  room: { id: number; title: string };
-};
+export default async function RoomInvitations() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+  if (!session) throw new Error("user not authentication");
 
-export default function RoomInvitations() {
-  const [invites, setInvites] = useState<Invite[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [actionLoading, setActionLoading] = useState<number | null>(null);
+  const userId = session.user.id;
 
-  useEffect(() => {
-    fetch("/api/invitations")
-      .then((res) => (res.ok ? res.json() : Promise.reject(res)))
-      .then(setInvites)
-      .catch(() => setError("Failed to load invitations"))
-      .finally(() => setLoading(false));
-  }, []);
+  const invites = await db
+    .select({ invite: userRooms, room: rooms })
+    .from(userRooms)
+    .where(and(eq(userRooms.userId, userId), eq(userRooms.status, "pending")))
+    .innerJoin(rooms, eq(userRooms.roomId, rooms.id));
 
-  async function handleAction(inviteId: number, action: "accept" | "deny") {
-    setActionLoading(inviteId);
-    setError("");
-    try {
-      const res = await fetch("/api/invitations", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ inviteId, action }),
-      });
-      if (!res.ok) throw new Error(await res.text());
-      setInvites(invites.filter((i) => i.invite.id !== inviteId));
-    } catch (err: any) {
-      setError(err.message || "Failed to update invitation");
-    } finally {
-      setActionLoading(null);
-    }
-  }
-
-  if (loading) return <div>Loading invitations...</div>;
-  if (error) return <div className="text-red-500">{error}</div>;
   if (!invites.length) return <div>No invitations.</div>;
 
   return (
@@ -50,25 +30,7 @@ export default function RoomInvitations() {
           key={invite.id}
           className="flex items-center justify-between border rounded p-2"
         >
-          <span>
-            Invited to <b>{room.title}</b>
-          </span>
-          <div className="space-x-2">
-            <button
-              className="bg-green-600 text-white px-3 py-1 rounded"
-              disabled={actionLoading === invite.id}
-              onClick={() => handleAction(invite.id, "accept")}
-            >
-              Accept
-            </button>
-            <button
-              className="bg-red-600 text-white px-3 py-1 rounded"
-              disabled={actionLoading === invite.id}
-              onClick={() => handleAction(invite.id, "deny")}
-            >
-              Deny
-            </button>
-          </div>
+          <InviteItem invite={invite} room={room} />
         </li>
       ))}
     </ul>
