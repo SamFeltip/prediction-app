@@ -7,8 +7,9 @@ import { eq, and } from "drizzle-orm";
 export async function GET(req: Request) {
   const session = await auth.api.getSession({ headers: req.headers });
   if (!session) return new Response("Unauthorized", { status: 401 });
-  const userId = Number(session.user.id);
-  if (isNaN(userId)) return new Response("Invalid user id", { status: 400 });
+
+  const userId = session.user.id;
+
   // List pending invitations
   const invites = await db
     .select({ invite: userRooms, room: rooms })
@@ -22,8 +23,9 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   const session = await auth.api.getSession({ headers: req.headers });
   if (!session) return new Response("Unauthorized", { status: 401 });
-  const userId = Number(session.user.id);
-  if (isNaN(userId)) return new Response("Invalid user id", { status: 400 });
+
+  const userId = session.user.id;
+
   const { inviteId, action } = await req.json();
   if (!inviteId || !["accept", "deny"].includes(action))
     return new Response("Invalid request", { status: 400 });

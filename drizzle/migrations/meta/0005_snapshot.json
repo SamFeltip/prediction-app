@@ -1,5 +1,5 @@
 {
-  "id": "dee75f32-e91b-49fa-a340-55b671d26d31",
+  "id": "d2285f12-bb91-404c-a758-0ef3d3eab1ef",
   "prevId": "6d112c49-8626-4143-bb64-9231e28b2395",
   "version": "7",
   "dialect": "postgresql",
@@ -362,8 +362,7 @@
           "name": "room_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true,
-          "default": 1
+          "notNull": false
         },
         "creator_id": {
           "name": "creator_id",
@@ -497,7 +496,7 @@
         },
         "creator_id": {
           "name": "creator_id",
-          "type": "integer",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         }
@@ -747,7 +746,7 @@
         },
         "user_id": {
           "name": "user_id",
-          "type": "integer",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         }

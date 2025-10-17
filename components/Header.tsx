@@ -14,7 +14,6 @@ export function Header() {
           </h1>
         </div>
         <div className="flex items-center gap-4">
-          <CreateMarketButton />
           <UserNav />
         </div>
       </div>

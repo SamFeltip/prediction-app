@@ -5,8 +5,14 @@ import { markets, bets, answers } from "@/lib/schema";
 import { MarketWithBets } from "@/lib/betting/betCounts";
 import { Description } from "@radix-ui/react-dialog";
 
-export async function MarketList() {
-  const marketStats = await db
+
+type MarketListProps = {
+  roomId?: number;
+};
+
+export async function MarketList({ roomId }: MarketListProps = {}) {
+  const whereClause = roomId ? eq(markets.roomId, roomId) : undefined;
+  const query = db
     .select({
       markets: { ...markets },
       answers: { ...answers },
@@ -17,6 +23,7 @@ export async function MarketList() {
     .leftJoin(bets, eq(answers.id, bets.answerId))
     .groupBy(markets.id, answers.id)
     .orderBy(markets.resolvedAnswer, markets.createdAt);
+  const marketStats = whereClause ? await query.where(whereClause) : await query;
 
   console.log(marketStats);
 

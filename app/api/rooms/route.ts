@@ -11,8 +11,8 @@ export async function POST(req: Request) {
   if (!title) return new Response("Missing title", { status: 400 });
 
   // Create room
-  const creatorId = Number(session.user.id);
-  if (isNaN(creatorId)) return new Response("Invalid user id", { status: 400 });
+  const creatorId = session.user.id;
+
   const [room] = await db
     .insert(rooms)
     .values({ title, creator: creatorId })
@@ -29,8 +29,8 @@ export async function GET(req: Request) {
   const session = await auth.api.getSession({ headers: req.headers });
   if (!session) return new Response("Unauthorized", { status: 401 });
   // Get all rooms where user is a member (accepted)
-  const userId = Number(session.user.id);
-  if (isNaN(userId)) return new Response("Invalid user id", { status: 400 });
+  const userId = session.user.id;
+
   const userRoomRows = await db
     .select({ room: rooms, userRoom: userRooms })
     .from(userRooms)

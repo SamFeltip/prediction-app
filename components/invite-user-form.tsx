@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 export default function InviteUserForm({ roomId }: { roomId: number }) {
-  const [userId, setUserId] = useState("");
+  const [userName, setUserName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -17,11 +17,14 @@ export default function InviteUserForm({ roomId }: { roomId: number }) {
       const res = await fetch("/api/rooms/invite", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ roomId, userId }),
+        body: JSON.stringify({ roomId, userName }),
       });
-      if (!res.ok) throw new Error(await res.text());
+      const message = await res.json();
+      console.log({ message });
+      if (!res.ok) throw new Error(message.error);
+
       setSuccess("User invited!");
-      setUserId("");
+      setUserName("");
     } catch (err: any) {
       setError(err.message || "Failed to invite user");
     } finally {
@@ -35,8 +38,8 @@ export default function InviteUserForm({ roomId }: { roomId: number }) {
         type="text"
         className="border rounded px-2 py-1"
         placeholder="User ID to invite"
-        value={userId}
-        onChange={(e) => setUserId(e.target.value)}
+        value={userName}
+        onChange={(e) => setUserName(e.target.value)}
         required
       />
       <button

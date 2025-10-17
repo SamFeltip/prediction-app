@@ -82,7 +82,7 @@ export const userRooms = pgTable("userRooms", {
   roomId: integer("room_id")
     .notNull()
     .references(() => rooms.id, { onDelete: "cascade" }),
-  userId: integer("user_id")
+  userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
 });
@@ -90,7 +90,7 @@ export const userRooms = pgTable("userRooms", {
 export const rooms = pgTable("rooms", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
-  creator: integer("creator_id")
+  creator: text("creator_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
 });
@@ -101,10 +101,9 @@ export const markets = pgTable(
     id: serial("id").primaryKey(),
     title: text("title").notNull(),
     description: text("description"),
-    roomId: integer("room_id")
-      .notNull()
-      .default(1)
-      .references(() => rooms.id, { onDelete: "cascade" }),
+    roomId: integer("room_id").references(() => rooms.id, {
+      onDelete: "cascade",
+    }),
     creatorId: text("creator_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
