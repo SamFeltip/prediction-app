@@ -3,7 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function CreateRoomPage() {
+export default function CreateRoomForm({
+  onSuccess,
+}: {
+  onSuccess: () => void;
+}) {
   const [title, setTitle] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -25,30 +29,28 @@ export default function CreateRoomPage() {
       setError(err.message || "Failed to create room");
     } finally {
       setLoading(false);
+      onSuccess();
     }
   }
 
   return (
-    <div className="max-w-md mx-auto mt-10">
-      <h2 className="text-2xl font-bold mb-4">Create a New Room</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="text"
-          className="w-full border rounded px-3 py-2"
-          placeholder="Room title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-        />
-        <button
-          type="submit"
-          className="bg-primary text-white px-4 py-2 rounded"
-          disabled={loading}
-        >
-          {loading ? "Creating..." : "Create Room"}
-        </button>
-        {error && <div className="text-red-500">{error}</div>}
-      </form>
-    </div>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <input
+        type="text"
+        className="w-full border rounded px-3 py-2"
+        placeholder="Room title"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        required
+      />
+      <button
+        type="submit"
+        className="bg-primary text-white px-4 py-2 rounded"
+        disabled={loading}
+      >
+        {loading ? "Creating..." : "Create Room"}
+      </button>
+      {error && <div className="text-red-500">{error}</div>}
+    </form>
   );
 }

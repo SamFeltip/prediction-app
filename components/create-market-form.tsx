@@ -69,16 +69,18 @@ export function CreateMarketForm({ onSuccess, roomId }: CreateMarketFormProps) {
     }
 
     try {
+      const body = {
+        title,
+        description,
+        roomId,
+        deadline: new Date(deadline).toISOString(),
+        answers: trimmedAnswers.map((title) => ({ title })),
+      };
+
       const response = await fetch("/api/markets", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title,
-          description,
-          roomId,
-          deadline: new Date(deadline).toISOString(),
-          answers: trimmedAnswers.map((title) => ({ title })),
-        }),
+        body: JSON.stringify(body),
       });
 
       const data = await response.json();

@@ -107,7 +107,7 @@ export function MarketCard({
               : isExpired
               ? "Expired"
               : "Ends"}{" "}
-            {deadline.toLocaleDateString()}
+            {deadline.toLocaleDateString("en-GB")}
           </span>
         </div>
       </CardContent>

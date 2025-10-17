@@ -28,11 +28,12 @@ export function AnswerBar({
       <div className="flex items-center justify-between">
         <span className={titleClasses[size]}>{title}</span>
       </div>
+
       <div className={bodyStyles[size]}>
         <div
           className="h-full bg-accent transition-all"
           style={{
-            width: `${100 * width}%`,
+            width: isNaN(width) ? 0 : `${100 * width}%`,
           }}
         />
       </div>

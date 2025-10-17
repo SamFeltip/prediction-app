@@ -1,17 +1,14 @@
 import { db } from "@/lib/db";
 import { MarketCard, MarketWithBetCount } from "@/components/market-card";
-import { count, countDistinct, eq, sql, sum } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 import { markets, bets, answers } from "@/lib/schema";
-import { MarketWithBets } from "@/lib/betting/betCounts";
-import { Description } from "@radix-ui/react-dialog";
 
 type MarketListProps = {
-  roomId?: number;
+  roomId: number;
 };
 
-export async function MarketList({ roomId }: MarketListProps = {}) {
-  const whereClause = roomId ? eq(markets.roomId, roomId) : undefined;
-  const query = db
+export async function MarketList({ roomId }: MarketListProps) {
+  const marketStats = await db
     .select({
       markets: { ...markets },
       answers: { ...answers },
@@ -20,11 +17,9 @@ export async function MarketList({ roomId }: MarketListProps = {}) {
     .from(markets)
     .leftJoin(answers, eq(markets.id, answers.marketId))
     .leftJoin(bets, eq(answers.id, bets.answerId))
+    .where(eq(markets.roomId, roomId))
     .groupBy(markets.id, answers.id)
     .orderBy(markets.resolvedAnswer, markets.createdAt);
-  const marketStats = whereClause
-    ? await query.where(whereClause)
-    : await query;
 
   console.log(marketStats);
 
@@ -59,8 +54,6 @@ export async function MarketList({ roomId }: MarketListProps = {}) {
     }
   });
 
-  console.log(marketStats);
-
   if (marketStats.length === 0) {
     return (
       <div className="rounded-lg border border-border bg-card p-12 text-center">
@@ -70,27 +63,6 @@ export async function MarketList({ roomId }: MarketListProps = {}) {
       </div>
     );
   }
-
-  // TODO: use betCounts code to get all markets with their answers and bets
-
-  // const marketsWithBets = Object.values(
-  //   marketStats.reduce(
-  //     (acc: Record<number, MarketWithBetCount>, { markets, bets }) => {
-  //       // Ensure market exists in accumulator
-  //       if (!acc[markets.id]) {
-  //         acc[markets.id] = { ...markets, bets: [] };
-  //       }
-
-  //       // Push bet if present
-  //       if (bets && bets.id) {
-  //         acc[markets.id].bets.push(bets);
-  //       }
-
-  //       return acc;
-  //     },
-  //     {}
-  //   )
-  // );
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
