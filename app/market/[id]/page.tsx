@@ -1,15 +1,11 @@
 import { notFound } from "next/navigation";
-import { db } from "@/lib/db";
 import { MarketDetail } from "@/components/market-detail";
 import { BettingInterface } from "@/components/betting-interface";
 import { MarketBets } from "@/components/market-bets";
 import { MarketResolution } from "@/components/market-resolution";
-import { eq } from "drizzle-orm";
-import { markets } from "@/lib/schema";
 import { auth } from "@/lib/auth";
 import { EditMarket } from "@/components/edit-market";
 import { headers } from "next/headers";
-import { DeleteMarketButton } from "@/components/delete-market-button";
 import { Header } from "@/components/Header";
 import {
   getMarketWithBetsAndAnswers,

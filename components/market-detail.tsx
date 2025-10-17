@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { markets } from "@/lib/schema";
 import { InferSelectModel } from "drizzle-orm";
 import { MarketWithBets } from "@/lib/betting/betCounts";
+import { AnswerBar } from "./answer-bar";
 
 type MarketDetailProps = InferSelectModel<typeof markets>;
 
@@ -51,23 +52,12 @@ export function MarketDetail({ market }: { market: MarketWithBets }) {
             {market.resolvedAnswer ? "Final Result" : "Current Prediction"}
           </h3>
           {Object.values(market.answers).map((answer) => (
-            <div className="space-y-2" key={answer.id}>
-              <div className="flex items-center justify-between">
-                <span className="text-2xl font-bold ">{answer.title}</span>
-              </div>
-              <div className="h-3 overflow-hidden rounded-full bg-secondary">
-                <div
-                  className="h-full bg-accent transition-all"
-                  style={{
-                    width: `${
-                      betCount == 0
-                        ? 0
-                        : Object.values(answer.bets).length / betCount
-                    }`,
-                  }}
-                />
-              </div>
-            </div>
+            <AnswerBar
+              key={answer.id}
+              title={answer.title}
+              size={"md"}
+              width={Object.values(answer.bets).length / betCount}
+            />
           ))}
         </div>
 

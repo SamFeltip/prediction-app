@@ -13,6 +13,7 @@ import Link from "next/link";
 import { markets, bets, answers } from "@/lib/schema";
 import { InferSelectModel } from "drizzle-orm";
 import { MarketWithBets } from "@/lib/betting/betCounts";
+import { AnswerBar } from "./answer-bar";
 
 export type MarketWithBetCount = InferSelectModel<typeof markets> & {
   answers: Record<
@@ -64,19 +65,29 @@ export function MarketCard({
       <CardContent className="flex-1 space-y-4">
         {/* Probability Bar */}
         {answers.map((answer) => (
-          <div className="space-y-2" key={answer.id}>
-            <div className="flex items-center justify-between text-sm">
-              <span className="font-medium">{answer.title}</span>
-            </div>
-            <div className="h-2 overflow-hidden rounded-full bg-secondary">
-              <div
-                className="h-full bg-accent transition-all"
-                style={{
-                  width: `${totalBets == 0 ? 0 : answer.betCount / totalBets}`,
-                }}
-              />
-            </div>
-          </div>
+          <AnswerBar
+            key={answer.id}
+            title={answer.title}
+            size={"sm"}
+            width={answer.betCount / totalBets}
+          />
+          // <div className="space-y-2" key={answer.id}>
+          //   <div className="flex items-center justify-between text-sm">
+          //     <span className="font-medium">{answer.title}</span>
+          //   </div>
+          //   <div className="h-2 overflow-hidden rounded-full bg-secondary">
+          //     <div
+          //       className=" h-full bg-accent transition-all"
+          //       style={{
+          //         width: `${
+          //           totalBets === 0
+          //             ? 0
+          //             : `${(100 * answer.betCount) / totalBets}%`
+          //         }`,
+          //       }}
+          //     />
+          //   </div>
+          // </div>
         ))}
 
         {/* Stats */}
