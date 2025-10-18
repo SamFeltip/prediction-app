@@ -58,9 +58,13 @@ export async function sendSingupEmail(emailRequestDetails: {
   token: string;
 }): Promise<void> {
   const signupUrl = new URL(
-    emailRequestDetails.url,
+    `/api/auth/verify-email`,
     process.env.NEXT_PUBLIC_APP_URL
   );
+
+  signupUrl.searchParams.append("token", emailRequestDetails.token);
+  signupUrl.searchParams.append("callbackURL", "/");
+
   console.log("email sending: ", emailRequestDetails);
 
   const resend = new Resend(process.env.RESENT_API_KEY!);
