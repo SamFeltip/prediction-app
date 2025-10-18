@@ -1,0 +1,38 @@
+import type React from "react";
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import "./globals.css";
+import { AuthProvider } from "@/apps/next-app/components/auth-provider";
+import { Header } from "@/apps/next-app/components/Header";
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+export const metadata: Metadata = {
+  title: "Predict - Prediction Markets",
+  description: "Create and bet on wagers",
+  generator: "v0.app",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body className="antialiased">
+        <AuthProvider>
+          <div className="min-h-screen bg-background">{children}</div>
+        </AuthProvider>
+      </body>
+    </html>
+  );
+}
