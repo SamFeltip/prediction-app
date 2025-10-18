@@ -1,23 +1,16 @@
-"use client"
+import { useSession } from "@/lib/auth-client";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { UserDropdown } from "./user-dropdown";
+import { headers } from "next/headers";
+import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { userRooms } from "@/lib/schema";
+import { count } from "console";
+import { and, eq } from "drizzle-orm";
 
-import { useSession, signOut } from "@/lib/auth-client"
-import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { User, LogOut } from "lucide-react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-
-export function UserNav() {
-  const { data: session } = useSession()
-  const router = useRouter()
+export async function UserNav() {
+  const session = await auth.api.getSession({ headers: await headers() });
 
   if (!session) {
     return (
@@ -29,52 +22,28 @@ export function UserNav() {
           <Link href="/auth/signup">Sign Up</Link>
         </Button>
       </div>
-    )
+    );
   }
+
+  const inviteCountResult = await db
+    .select()
+    .from(userRooms)
+    .where(
+      and(
+        eq(userRooms.userId, session.user.id),
+        eq(userRooms.status, "pending")
+      )
+    );
+  const inviteCount = inviteCountResult.length;
 
   const initials =
     session.user.name
       ?.split(" ")
       .map((n) => n[0])
       .join("")
-      .toUpperCase() || "U"
+      .toUpperCase() || "U";
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-          <Avatar>
-            <AvatarFallback className="bg-primary text-primary-foreground">{initials}</AvatarFallback>
-          </Avatar>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end">
-        <DropdownMenuLabel>
-          <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium">{session.user.name}</p>
-            <p className="text-xs text-muted-foreground">{session.user.email}</p>
-          </div>
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link href="/profile" className="flex items-center">
-            <User className="mr-2 h-4 w-4" />
-            Profile
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem
-          onClick={async () => {
-            await signOut()
-            router.push("/")
-            router.refresh()
-          }}
-          className="text-destructive"
-        >
-          <LogOut className="mr-2 h-4 w-4" />
-          Sign Out
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  )
+    <UserDropdown user={session.user} initials={initials} count={inviteCount} />
+  );
 }

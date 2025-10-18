@@ -13,7 +13,10 @@ export default async function RoomList() {
   const userId = session.user.id;
 
   const userRoomRows = await db
-    .select({ room: rooms, userRoom: userRooms })
+    .selectDistinctOn([rooms.id], {
+      room: rooms,
+      userRoom: userRooms,
+    })
     .from(userRooms)
     .where(and(eq(userRooms.userId, userId), eq(userRooms.status, "accepted")))
     .leftJoin(rooms, eq(userRooms.roomId, rooms.id));
