@@ -3,8 +3,19 @@ import { Header } from "@/apps/next-app/components/Header";
 import RoomList from "@/apps/next-app/components/room-list";
 import { CreateRoomButton } from "@/apps/next-app/components/create-room-button";
 import { Main } from "../components/main";
+import { auth } from "../lib/auth";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    redirect("/auth/signin");
+  }
+
   return (
     <>
       <Header />

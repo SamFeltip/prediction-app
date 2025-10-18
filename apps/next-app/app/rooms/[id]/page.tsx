@@ -15,6 +15,7 @@ import { rooms, user, userRooms } from "@lib/schema";
 import { eq, and } from "drizzle-orm";
 
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
 export default async function RoomDetailPage({
@@ -33,7 +34,7 @@ export default async function RoomDetailPage({
   });
 
   if (!session) {
-    throw new Error("user not authenticated");
+    redirect("/auth/signin");
   }
 
   const roomResult = await db

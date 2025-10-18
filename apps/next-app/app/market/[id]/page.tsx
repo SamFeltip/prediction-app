@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { MarketDetail } from "@/apps/next-app/components/market-detail";
 import { BettingInterface } from "@/apps/next-app/components/betting-interface";
 import { MarketBets } from "@/apps/next-app/components/market-bets";
@@ -27,6 +27,10 @@ export default async function MarketPage({ params }: MarketPageProps) {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
+
+  if (!session) {
+    redirect("/auth/signin");
+  }
 
   const userId = session?.user?.id;
 
