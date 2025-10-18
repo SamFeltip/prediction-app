@@ -24,8 +24,6 @@ export async function MarketList({ roomId }: MarketListProps) {
     .groupBy(markets.id, answers.id)
     .orderBy(markets.resolvedAnswer, markets.createdAt);
 
-  console.log(marketStats);
-
   let marketResults: Record<number, MarketWithBetCount> = [];
 
   marketStats.forEach((element) => {

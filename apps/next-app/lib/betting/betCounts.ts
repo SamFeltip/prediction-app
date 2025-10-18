@@ -25,7 +25,6 @@ export async function getMarketWithBetsAndAnswers(
     .where(eq(markets.id, marketId));
 
   console.log("marketBets");
-  console.log(marketBets);
 
   if (marketBets[0]?.markets == null) {
     throw new Error("Market not found");

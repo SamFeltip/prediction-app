@@ -58,6 +58,10 @@ export async function sendSingupEmail(emailRequestDetails: {
   token: string;
   request: Request | undefined;
 }): Promise<void> {
+  const signupUrl = new URL(
+    emailRequestDetails.url,
+    process.env.NEXT_PUBLIC_APP_URL
+  );
   console.log("email sending", emailRequestDetails);
 
   const resend = new Resend(process.env.RESENT_API_KEY!);
@@ -72,7 +76,7 @@ export async function sendSingupEmail(emailRequestDetails: {
       Please click the button below to verify your email address:
     </p>
     <div style="text-align: center; margin: 32px 0;">
-      <a href="${emailRequestDetails.url}" style="background-color: #007bff; color: #fff; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: bold; display: inline-block;">
+      <a href="${signupUrl}" style="background-color: #007bff; color: #fff; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: bold; display: inline-block;">
         Verify Email
       </a>
     </div>
@@ -80,7 +84,7 @@ export async function sendSingupEmail(emailRequestDetails: {
       If the button doesn't work, you can also verify your email by copying and pasting this link into your browser:
     </p>
     <p style="word-break: break-all; font-size: 14px;">
-      <a href="${emailRequestDetails.url}" style="color: #007bff;">${emailRequestDetails.url}</a>
+      <a href="${signupUrl}" style="color: #007bff;">${signupUrl}</a>
     </p>
     <p style="font-size: 14px; color: #999; margin-top: 40px; text-align: center;">
       This link will expire shortly for your security.

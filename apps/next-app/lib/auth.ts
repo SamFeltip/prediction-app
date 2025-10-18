@@ -16,9 +16,11 @@ export const auth = betterAuth({
     autoSignInAfterVerification: true,
 
     sendVerificationEmail: async ({ user, url, token }, request) => {
+      console.log("url: ", url);
+      console.log("request url: ", request?.url);
+
       if (user.email.indexOf("@example.com") !== -1) {
         console.log("Sending email to test email, instead of:", user.email);
-
         await sendSingupEmail({
           name: user.name || "Test User",
           id: user.id,
