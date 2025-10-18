@@ -1,0 +1,1 @@
+ALTER TABLE "userRooms" RENAME COLUMN "newId" TO "id";

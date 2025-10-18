@@ -2,8 +2,7 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 
 import { db } from "@/apps/next-app/lib/db";
-import { sendEmail } from "./email";
-import { authClient } from "./auth-client";
+import { sendSingupEmail } from "./email";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -20,7 +19,7 @@ export const auth = betterAuth({
       if (user.email.indexOf("@example.com") !== -1) {
         console.log("Sending email to test email, instead of:", user.email);
 
-        await sendEmail({
+        await sendSingupEmail({
           name: user.name || "Test User",
           id: user.id,
           email: "sf.samfelton@icloud.com",
@@ -32,7 +31,7 @@ export const auth = betterAuth({
         return;
       }
 
-      await sendEmail({
+      await sendSingupEmail({
         name: user.name,
         id: user.id,
         email: user.email,

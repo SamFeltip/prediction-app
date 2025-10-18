@@ -10,19 +10,19 @@ export function InviteItem({
   invite,
   room,
 }: {
-  invite: { id: number };
+  invite: { id: string };
   room: InferSelectModel<typeof rooms>;
 }) {
   const router = useRouter();
 
-  const [actionLoading, setActionLoading] = useState<number | null>(null);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [error, setError] = useState("");
 
-  async function handleAction(inviteId: number, action: "accept" | "deny") {
+  async function handleAction(inviteId: string, action: "accept" | "deny") {
     setActionLoading(inviteId);
     setError("");
     try {
-      const res = await fetch("/api/invitations", {
+      const res = await fetch("/api/invites/reply", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ inviteId, action }),

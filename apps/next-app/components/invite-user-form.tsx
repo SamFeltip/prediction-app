@@ -5,7 +5,7 @@ import { useState } from "react";
 
 export default function InviteUserForm({ roomId }: { roomId: number }) {
   const router = useRouter();
-  const [userName, setUserName] = useState("");
+  const [userEmail, setUserEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -16,17 +16,17 @@ export default function InviteUserForm({ roomId }: { roomId: number }) {
     setError("");
     setSuccess("");
     try {
-      const res = await fetch("/api/rooms/invite", {
+      const res = await fetch("/api/invites", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ roomId, userName }),
+        body: JSON.stringify({ roomId, userEmail: userEmail }),
       });
       const message = await res.json();
       console.log({ message });
       if (!res.ok) throw new Error(message.error);
 
       setSuccess("User invited!");
-      setUserName("");
+      setUserEmail("");
       router.refresh();
     } catch (err: any) {
       setError(err.message || "Failed to invite user");
@@ -40,9 +40,9 @@ export default function InviteUserForm({ roomId }: { roomId: number }) {
       <input
         type="text"
         className="border rounded px-2 py-1"
-        placeholder="User ID to invite"
-        value={userName}
-        onChange={(e) => setUserName(e.target.value)}
+        placeholder="User email to invite"
+        value={userEmail}
+        onChange={(e) => setUserEmail(e.target.value)}
         required
       />
       <button

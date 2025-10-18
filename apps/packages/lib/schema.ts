@@ -9,6 +9,7 @@ import {
   index,
   uniqueIndex,
   pgEnum,
+  uuid,
 } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
@@ -77,7 +78,7 @@ export const userRoomInviteEnum = pgEnum("userRoomInvite", [
 ]);
 
 export const userRooms = pgTable("userRooms", {
-  id: serial("id").primaryKey(),
+  id: uuid().defaultRandom().primaryKey(),
   status: userRoomInviteEnum().default("pending").notNull(),
   roomId: integer("room_id")
     .notNull()

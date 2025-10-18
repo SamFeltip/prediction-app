@@ -43,6 +43,34 @@
       "when": 1760710188597,
       "tag": "0005_real_speedball",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1760808002530,
+      "tag": "0006_hard_toad",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1760808113337,
+      "tag": "0007_fixed_cannonball",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1760808129317,
+      "tag": "0008_shiny_rhino",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1760808147972,
+      "tag": "0009_square_bug",
+      "breakpoints": true
     }
   ]
 }

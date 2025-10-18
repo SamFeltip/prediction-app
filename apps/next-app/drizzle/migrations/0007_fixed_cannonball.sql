@@ -1,0 +1,1 @@
+ALTER TABLE "userRooms" ADD COLUMN "newId" uuid DEFAULT gen_random_uuid();
