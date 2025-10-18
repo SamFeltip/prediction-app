@@ -14,22 +14,34 @@ export function SignUpForm() {
     const name = formData.get("name") as string;
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
+    const profile = formData.get("profile") as File;
+    let data;
 
     try {
-      const res = await auth.api.signUpEmail({
+      data = await auth.api.signUpEmail({
         body: { email, password, name },
       });
-
-      formData.append("userId", res.user.id || "");
-
-      const workerUrl = new URL("/upload", process.env.NEXT_PUBLIC_WORKERS_URL);
-      const imgResult = await fetch(workerUrl.toString(), {
-        method: "POST",
-        body: formData,
-      });
-      console.debug("Image upload response:", imgResult);
     } catch (err) {
       console.error("Sign-up error:", err);
+    }
+
+    if (profile.size > 0 && data) {
+      try {
+        console.log(profile);
+        formData.append("userId", data.user.id || "");
+
+        const workerUrl = new URL(
+          "/upload",
+          process.env.NEXT_PUBLIC_WORKERS_URL
+        );
+        const imgResult = await fetch(workerUrl.toString(), {
+          method: "POST",
+          body: formData,
+        });
+        console.debug("Image upload response:", imgResult);
+      } catch (err) {
+        console.error("Profile upload error:", err);
+      }
     }
 
     redirect("/verify");

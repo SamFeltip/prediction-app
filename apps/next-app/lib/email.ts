@@ -56,13 +56,12 @@ export async function sendSingupEmail(emailRequestDetails: {
   email: string;
   url: string;
   token: string;
-  request: Request | undefined;
 }): Promise<void> {
   const signupUrl = new URL(
     emailRequestDetails.url,
     process.env.NEXT_PUBLIC_APP_URL
   );
-  console.log("email sending", emailRequestDetails);
+  console.log("email sending: ", emailRequestDetails);
 
   const resend = new Resend(process.env.RESENT_API_KEY!);
 

@@ -27,20 +27,18 @@ export const auth = betterAuth({
           email: "sf.samfelton@icloud.com",
           url,
           token,
-          request,
         });
 
         return;
+      } else {
+        await sendSingupEmail({
+          name: user.name,
+          id: user.id,
+          email: user.email,
+          url,
+          token,
+        });
       }
-
-      await sendSingupEmail({
-        name: user.name,
-        id: user.id,
-        email: user.email,
-        url,
-        token,
-        request,
-      });
     },
   },
 });
