@@ -2,9 +2,15 @@ import { CreateMarketButton } from "@/apps/next-app/components/create-market-but
 import { Header } from "@/apps/next-app/components/Header";
 import InviteUserForm from "@/apps/next-app/components/invite-user-form";
 import { MarketList } from "@/apps/next-app/components/market-list";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/apps/next-app/components/ui/avatar";
 import { auth } from "@/apps/next-app/lib/auth";
 import { db } from "@/apps/next-app/lib/db";
-import { rooms, userRooms } from "@lib/schema";
+import { getInitials } from "@/apps/next-app/lib/getInitials";
+import { rooms, user, userRooms } from "@lib/schema";
 import { eq, and } from "drizzle-orm";
 
 import { headers } from "next/headers";
@@ -40,6 +46,12 @@ export default async function RoomDetailPage({
   }
 
   const { rooms: r } = roomResult[0];
+
+  const userRoomResult = await db
+    .select()
+    .from(userRooms)
+    .innerJoin(user, eq(user.id, userRooms.userId))
+    .where(eq(userRooms.roomId, roomId));
   return (
     <>
       <Header />
@@ -50,7 +62,26 @@ export default async function RoomDetailPage({
             <CreateMarketButton roomId={roomId} />
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex justify-between mb-4">
+            <div className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2">
+              {userRoomResult.map((userRoom) => (
+                <Avatar
+                  key={userRoom.userRooms.id}
+                  className={
+                    userRoom.userRooms.status === "pending" ? "grayscale" : ""
+                  }
+                >
+                  <AvatarImage
+                    src={userRoom.user.image || undefined}
+                    alt={userRoom.user.name || "User Avatar"}
+                  />
+                  <AvatarFallback>
+                    {getInitials(userRoom.user.name)}
+                  </AvatarFallback>
+                </Avatar>
+              ))}
+            </div>
+
             <InviteUserForm roomId={roomId} />
           </div>
           <Suspense fallback={<div>Loading wagers...</div>}>

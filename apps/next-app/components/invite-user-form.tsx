@@ -1,8 +1,10 @@
 // Form to invite a user to a room by user ID
 "use client";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function InviteUserForm({ roomId }: { roomId: number }) {
+  const router = useRouter();
   const [userName, setUserName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -25,6 +27,7 @@ export default function InviteUserForm({ roomId }: { roomId: number }) {
 
       setSuccess("User invited!");
       setUserName("");
+      router.refresh();
     } catch (err: any) {
       setError(err.message || "Failed to invite user");
     } finally {
@@ -33,7 +36,7 @@ export default function InviteUserForm({ roomId }: { roomId: number }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2 items-center mt-4">
+    <form onSubmit={handleSubmit} className="flex gap-2 items-center">
       <input
         type="text"
         className="border rounded px-2 py-1"

@@ -19,6 +19,7 @@ import { Header } from "@/apps/next-app/components/Header";
 import RoomInvitations from "@/apps/next-app/components/room-invitations";
 import { Suspense } from "react";
 import { AvatarImage } from "@radix-ui/react-avatar";
+import { getInitials } from "../../lib/getInitials";
 
 export default async function ProfilePage() {
   const session = await auth.api.getSession({
@@ -55,12 +56,7 @@ export default async function ProfilePage() {
       ? Math.round((wonBets.length / resolvedBets.length) * 100)
       : 0;
 
-  const initials =
-    session.user.name
-      ?.split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase() || "U";
+  const initials = getInitials(session.user.name);
 
   return (
     <>
