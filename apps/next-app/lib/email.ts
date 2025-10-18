@@ -54,7 +54,6 @@ export async function sendSingupEmail(emailRequestDetails: {
   id: string;
   name: string;
   email: string;
-  url: string;
   token: string;
 }): Promise<void> {
   const signupUrl = new URL(

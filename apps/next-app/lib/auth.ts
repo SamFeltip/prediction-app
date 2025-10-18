@@ -25,7 +25,6 @@ export const auth = betterAuth({
           name: user.name || "Test User",
           id: user.id,
           email: "sf.samfelton@icloud.com",
-          url,
           token,
         });
 
@@ -35,7 +34,6 @@ export const auth = betterAuth({
           name: user.name,
           id: user.id,
           email: user.email,
-          url,
           token,
         });
       }
