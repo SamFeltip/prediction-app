@@ -22,7 +22,7 @@ export default {
 		}
 
 		console.debug('Connecting to database');
-		const sql = neon(env.MY_DATABASE);
+		const sql = neon(env.DATABASE_URL);
 		const db = drizzle({ client: sql });
 
 		console.debug('Querying user from database:', userId);
@@ -40,7 +40,7 @@ export default {
 		});
 
 		console.debug('Sending email to:', u.email);
-		var message = new EmailMessage(env.EMAIL_FROM, u.email, msg.asRaw());
+		let message = new EmailMessage(env.EMAIL_FROM, u.email, msg.asRaw());
 
 		try {
 			await env.EMAIL.send(message);
