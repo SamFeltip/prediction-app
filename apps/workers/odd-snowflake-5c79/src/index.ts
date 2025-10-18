@@ -3,9 +3,6 @@ import { drizzle } from 'drizzle-orm/neon-http';
 import { user } from '@lib/schema';
 import { eq } from 'drizzle-orm';
 
-import { EmailMessage } from 'cloudflare:email';
-import { createMimeMessage } from 'mimetext/browser';
-
 export default {
 	async fetch(request, env, ctx): Promise<Response> {
 		console.debug('Request received in worker');
@@ -29,32 +26,6 @@ export default {
 		const res = await db.select().from(user).where(eq(user.id, userId)).limit(1);
 		const u = res[0];
 
-		console.debug('Creating email message for user:', u.email);
-		const msg = createMimeMessage();
-		msg.setSender({ name: 'Sam F Predict', addr: env.EMAIL_FROM });
-		msg.setRecipient(u.email);
-		msg.setSubject('An email generated in a worker');
-		msg.addMessage({
-			contentType: 'text/plain',
-			data: `Congratulations, you just sent an email from a worker.`,
-		});
-
-		console.debug('Sending email to:', u.email);
-		let message = new EmailMessage(env.EMAIL_FROM, u.email, msg.asRaw());
-
-		try {
-			await env.EMAIL.send(message);
-		} catch (e) {
-			console.error('Failed to send email:', e);
-			if (e instanceof Error === false) {
-				console.error(e);
-				return new Response('Unknown error occurred');
-			}
-
-			return Response.json({ error: e.message });
-		}
-
-		console.debug('Email sent successfully to:', u.email);
 		return Response.json({ hello: u.name });
 	},
 } satisfies ExportedHandler<Env>;
