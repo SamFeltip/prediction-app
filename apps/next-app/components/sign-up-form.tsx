@@ -6,6 +6,7 @@ import { Input } from "@/apps/next-app/components/ui/input";
 import { Label } from "@/apps/next-app/components/ui/label";
 import { redirect } from "next/navigation";
 import { auth } from "../lib/auth";
+import { CreateAccountButton } from "./create-account-button";
 
 export function SignUpForm() {
   async function handleSubmit(formData: FormData) {
@@ -97,9 +98,7 @@ export function SignUpForm() {
         </div>
       </div>
 
-      <Button type="submit" className="w-full">
-        Create account
-      </Button>
+      <CreateAccountButton />
     </form>
   );
 }
