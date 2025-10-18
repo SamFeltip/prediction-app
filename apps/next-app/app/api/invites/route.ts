@@ -62,6 +62,7 @@ export async function POST(req: Request) {
     .where(
       and(eq(userRooms.roomId, roomId), eq(userRooms.userId, invitedUser.id))
     );
+
   if (userRoomResult.length > 0) {
     const userRoom = userRoomResult[0];
 
@@ -82,6 +83,8 @@ export async function POST(req: Request) {
     }
   }
 
+  console.debug("inviting user to room");
+
   const newUserRoomResult = await db
     .insert(userRooms)
     .values({ roomId: roomIdNum, userId: invitedUser.id, status: "pending" })
@@ -98,6 +101,8 @@ export async function POST(req: Request) {
   if (invitedUser.email.indexOf("@example.com") !== -1) {
     inviteEmailUser.email = "sf.samfelton@icloud.com";
   }
+
+  console.debug("sending invite email", { roomUrl });
 
   await sendInviteEmail({
     user: inviteEmailUser,

@@ -6,6 +6,7 @@ export async function sendInviteEmail(emailRequestDetails: {
   url: string;
 }) {
   const resend = new Resend(process.env.RESENT_API_KEY!);
+  console.debug("sendInviteEmail", { emailRequestDetails });
 
   const html = `
   <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #ddd; border-radius: 8px; background-color: #fafafa;">
