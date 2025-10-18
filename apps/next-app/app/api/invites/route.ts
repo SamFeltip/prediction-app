@@ -26,8 +26,8 @@ export async function POST(req: Request) {
       { status: 401 }
     );
   }
-  // Insert invitation (pending)
 
+  // Insert invitation (pending)
   console.debug("checking room exists");
 
   const roomResult = await db

@@ -1,7 +1,6 @@
 import type React from "react";
 
 import { useState } from "react";
-// import { useRouter } from "next/navigation";
 import { Button } from "@/apps/next-app/components/ui/button";
 import { Input } from "@/apps/next-app/components/ui/input";
 import { Label } from "@/apps/next-app/components/ui/label";
@@ -11,9 +10,6 @@ import { auth } from "../lib/auth";
 export function SignUpForm() {
   async function handleSubmit(formData: FormData) {
     "use server";
-
-    // setLoading(true);
-    // setError("");
 
     const name = formData.get("name") as string;
     const email = formData.get("email") as string;
@@ -32,10 +28,8 @@ export function SignUpForm() {
         body: formData,
       });
       console.debug("Image upload response:", imgResult);
-      // router.refresh();
     } catch (err) {
       console.error("Sign-up error:", err);
-      // setError("Failed to create account. Email may already be in use.");
     }
 
     redirect("/verify");
@@ -91,16 +85,8 @@ export function SignUpForm() {
         </div>
       </div>
 
-      {/* {error && (
-        <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-          {error}
-        </div>
-      )} */}
-
-      {/* <Button type="submit" className="w-full" disabled={loading}> */}
       <Button type="submit" className="w-full">
         Create account
-        {/* {loading ? "Creating account..." : "Create account"} */}
       </Button>
     </form>
   );
