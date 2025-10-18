@@ -1,6 +1,7 @@
 import { CreateMarketButton } from "@/apps/next-app/components/create-market-button";
 import { Header } from "@/apps/next-app/components/Header";
 import InviteUserForm from "@/apps/next-app/components/invite-user-form";
+import { Main } from "@/apps/next-app/components/main";
 import { MarketList } from "@/apps/next-app/components/market-list";
 import {
   Avatar,
@@ -55,8 +56,8 @@ export default async function RoomDetailPage({
   return (
     <>
       <Header />
-      <main className="container mx-auto px-4 py-4">
-        <div className="max-w-2xl mx-auto md:mt-10 flex flex-col gap-2">
+      <Main>
+        <div className="flex flex-col gap-2">
           <div className="flex justify-between">
             <h2 className="text-2xl font-bold mb-4">{r.title}</h2>
             <CreateMarketButton roomId={roomId} />
@@ -88,7 +89,7 @@ export default async function RoomDetailPage({
             <MarketList roomId={roomId} />
           </Suspense>
         </div>
-      </main>
+      </Main>
     </>
   );
 }
