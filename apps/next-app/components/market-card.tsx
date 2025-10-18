@@ -71,23 +71,6 @@ export function MarketCard({
             size={"sm"}
             width={answer.betCount / totalBets}
           />
-          // <div className="space-y-2" key={answer.id}>
-          //   <div className="flex items-center justify-between text-sm">
-          //     <span className="font-medium">{answer.title}</span>
-          //   </div>
-          //   <div className="h-2 overflow-hidden rounded-full bg-secondary">
-          //     <div
-          //       className=" h-full bg-accent transition-all"
-          //       style={{
-          //         width: `${
-          //           totalBets === 0
-          //             ? 0
-          //             : `${(100 * answer.betCount) / totalBets}%`
-          //         }`,
-          //       }}
-          //     />
-          //   </div>
-          // </div>
         ))}
 
         {/* Stats */}

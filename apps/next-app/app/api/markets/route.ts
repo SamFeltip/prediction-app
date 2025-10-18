@@ -6,30 +6,6 @@ import { and, countDistinct, eq, isNull, sum } from "drizzle-orm";
 import { markets, bets, answers } from "@lib/schema";
 import { sql } from "drizzle-orm";
 
-// export async function GET() {
-//   try {
-//     const marketStats = await db
-//       .select({
-//         ...markets,
-//         betCount: countDistinct(bets.id),
-//         yesBets: countDistinct(sql`case when ${bets.prediction} = true then ${bets.id} end`),
-//         noBets: countDistinct(sql`case when ${bets.prediction} = false then ${bets.id} end`),
-//         yesPoints: sql<number>`coalesce(sum(case when ${bets.prediction} = true then ${bets.points} end), 0)`,
-//         noPoints: sql<number>`coalesce(sum(case when ${bets.prediction} = false then ${bets.points} end), 0)`,
-//       })
-//       .from(markets)
-//       .leftJoin(bets, eq(markets.id, bets.marketId))
-//       .where(eq(markets.resolved, false))
-//       .groupBy(markets.id)
-//       .orderBy(markets.createdAt);
-
-//     return NextResponse.json({ markets: marketStats });
-//   } catch (error) {
-//     console.error("[v0] Error fetching markets:", error);
-//     return NextResponse.json({ error: "Failed to fetch markets" }, { status: 500 });
-//   }
-// }
-
 export async function POST(request: NextRequest) {
   try {
     const session = await auth.api.getSession({
@@ -100,7 +76,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("[v0] Error creating market:", error);
     return NextResponse.json(
-      { error: "Failed to create market" },
+      { error: "Failed to create wager" },
       { status: 500 }
     );
   }

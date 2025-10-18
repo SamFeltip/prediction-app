@@ -187,7 +187,7 @@ export function CreateMarketForm({ onSuccess, roomId }: CreateMarketFormProps) {
       )}
 
       <Button type="submit" className="w-full" disabled={loading}>
-        {loading ? "Creating..." : "Create Market"}
+        {loading ? "Creating..." : "Create Wager"}
       </Button>
     </form>
   );

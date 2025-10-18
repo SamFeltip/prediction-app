@@ -2,6 +2,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "./ui/button";
 
 export default function CreateRoomForm({
   onSuccess,
@@ -43,13 +44,13 @@ export default function CreateRoomForm({
         onChange={(e) => setTitle(e.target.value)}
         required
       />
-      <button
+      <Button
         type="submit"
         className="bg-primary text-white px-4 py-2 rounded"
         disabled={loading}
       >
         {loading ? "Creating..." : "Create Room"}
-      </button>
+      </Button>
       {error && <div className="text-red-500">{error}</div>}
     </form>
   );
