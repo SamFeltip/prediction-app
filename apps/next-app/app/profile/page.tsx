@@ -80,7 +80,10 @@ export default async function ProfilePage() {
               <CardContent className="space-y-6">
                 <div className="flex flex-col items-center gap-4">
                   <Avatar className="h-24 w-24">
-                    <AvatarImage src={session.user.image ?? ""} />
+                    <AvatarImage
+                      src={session.user.image ?? ""}
+                      className="object-cover w-100"
+                    />
                     <AvatarFallback className="bg-primary text-3xl text-primary-foreground">
                       {initials}
                     </AvatarFallback>
