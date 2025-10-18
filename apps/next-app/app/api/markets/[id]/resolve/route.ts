@@ -87,7 +87,6 @@ export async function POST(request: NextRequest, context: RouteContext) {
     const losingBets = allBets.filter((bet) => bet.answerId !== answerId);
 
     const totalLosingPoints = losingBets.length;
-    const totalWinningPoints = winningBets.length;
 
     // Distribute points to winners proportionally
     for (const bet of winningBets) {
@@ -118,9 +117,13 @@ export async function POST(request: NextRequest, context: RouteContext) {
 
       const currentPoints = userPointsRecord.points;
 
+      const companionLooserBets = losingBets.filter(
+        (b) => b.answerId === bet.answerId
+      );
+
       await db.insert(userPoints).values({
         userId: bet.userId,
-        points: currentPoints - totalWinningPoints,
+        points: currentPoints - companionLooserBets.length,
       });
     }
 
