@@ -1,47 +1,58 @@
-"use client";
-
 import type React from "react";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { signUp } from "@/apps/next-app/lib/auth-client";
+// import { useRouter } from "next/navigation";
 import { Button } from "@/apps/next-app/components/ui/button";
 import { Input } from "@/apps/next-app/components/ui/input";
 import { Label } from "@/apps/next-app/components/ui/label";
+import { redirect } from "next/navigation";
+import { auth } from "../lib/auth";
 
 export function SignUpForm() {
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  async function handleSubmit(formData: FormData) {
+    "use server";
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
+    // setLoading(true);
+    // setError("");
 
-    const formData = new FormData(e.currentTarget);
     const name = formData.get("name") as string;
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
     try {
-      await signUp.email({
-        email,
-        password,
-        name,
+      const res = await auth.api.signUpEmail({
+        body: { email, password, name },
       });
-      router.push("/");
-      router.refresh();
+
+      formData.append("userId", res.user.id || "");
+
+      const workerUrl = new URL("/upload", process.env.NEXT_PUBLIC_WORKERS_URL);
+      const imgResult = await fetch(workerUrl.toString(), {
+        method: "POST",
+        body: formData,
+      });
+      console.debug("Image upload response:", imgResult);
+      // router.refresh();
     } catch (err) {
-      setError("Failed to create account. Email may already be in use.");
-    } finally {
-      setLoading(false);
+      console.error("Sign-up error:", err);
+      // setError("Failed to create account. Email may already be in use.");
     }
+
+    redirect("/");
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form action={handleSubmit} className="space-y-6">
       <div className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="profile">Profile pic</Label>
+          <Input
+            id="profile"
+            name="profile"
+            type="file"
+            autoComplete="profile"
+          />
+        </div>
         <div className="space-y-2">
           <Label htmlFor="name">Name</Label>
           <Input
@@ -80,14 +91,16 @@ export function SignUpForm() {
         </div>
       </div>
 
-      {error && (
+      {/* {error && (
         <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
           {error}
         </div>
-      )}
+      )} */}
 
-      <Button type="submit" className="w-full" disabled={loading}>
-        {loading ? "Creating account..." : "Create account"}
+      {/* <Button type="submit" className="w-full" disabled={loading}> */}
+      <Button type="submit" className="w-full">
+        Create account
+        {/* {loading ? "Creating account..." : "Create account"} */}
       </Button>
     </form>
   );

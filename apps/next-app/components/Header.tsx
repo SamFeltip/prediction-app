@@ -23,7 +23,7 @@ export async function Header() {
           <Suspense
             fallback={
               <Avatar>
-                <AvatarFallback className="bg-primary text-primary-foreground">
+                <AvatarFallback className=" text-primary-foreground">
                   {"?"}
                 </AvatarFallback>
               </Avatar>

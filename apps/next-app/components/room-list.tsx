@@ -25,14 +25,19 @@ export default async function RoomList() {
   if (!roomList.length) return <div>No rooms found.</div>;
 
   return (
-    <ul className="space-y-2">
-      {roomList.map((room) => (
-        <li key={room!.id}>
-          <Link href={`/rooms/${room!.id}`} className="text-blue-600 underline">
-            {room!.title}
-          </Link>
-        </li>
-      ))}
-    </ul>
+    <>
+      <ul className="space-y-2">
+        {roomList.map((room) => (
+          <li key={room!.id}>
+            <Link
+              href={`/rooms/${room!.id}`}
+              className="text-blue-600 underline"
+            >
+              {room!.title}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </>
   );
 }

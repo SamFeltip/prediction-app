@@ -21,6 +21,7 @@ export const auth = betterAuth({
         console.log("Sending email to test email, instead of:", user.email);
 
         await sendEmail({
+          name: user.name || "Test User",
           id: user.id,
           email: "sf.samfelton@icloud.com",
           url,
@@ -31,7 +32,14 @@ export const auth = betterAuth({
         return;
       }
 
-      await sendEmail({ id: user.id, email: user.email, url, token, request });
+      await sendEmail({
+        name: user.name,
+        id: user.id,
+        email: user.email,
+        url,
+        token,
+        request,
+      });
     },
   },
 });

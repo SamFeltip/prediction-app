@@ -2,6 +2,7 @@ import { Resend } from "resend";
 
 export async function sendEmail(emailRequestDetails: {
   id: string;
+  name: string;
   email: string;
   url: string;
   token: string;
@@ -15,7 +16,7 @@ export async function sendEmail(emailRequestDetails: {
   <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #ddd; border-radius: 8px; background-color: #fafafa;">
     <h1 style="color: #2c3e50; text-align: center;">Verify Your Email</h1>
     <p style="font-size: 16px; line-height: 1.5;">
-      Hello,
+      Hello, ${emailRequestDetails.name},
     </p>
     <p style="font-size: 16px; line-height: 1.5;">
       Please click the button below to verify your email address:

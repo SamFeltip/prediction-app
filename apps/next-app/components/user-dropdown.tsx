@@ -1,7 +1,7 @@
 "use client";
 
 import { signOut } from "@/apps/next-app/lib/auth-client";
-import { Avatar, AvatarFallback } from "@radix-ui/react-avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -22,7 +22,7 @@ export function UserDropdown({
   initials,
   count,
 }: {
-  user: { name: string; email: string };
+  user: { name: string; email: string; image?: string | null };
   initials: string;
   count: number;
 }) {
@@ -32,9 +32,10 @@ export function UserDropdown({
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className="relative rounded-full h-8 w-8 bg-primary text-primary-foreground"
+          className="relative rounded-full h-8 w-8 text-primary-foreground"
         >
           <Avatar>
+            <AvatarImage src={user.image ?? ""} />
             <AvatarFallback className="">{initials}</AvatarFallback>
           </Avatar>
           {count > 0 && (

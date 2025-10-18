@@ -14,10 +14,11 @@ import { Coins, TrendingUp, Trophy, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/apps/next-app/components/ui/button";
 import { eq } from "drizzle-orm";
-import { userPoints, bets, markets, answers } from "@lib/schema";
+import { userPoints, bets, markets, answers, user } from "@lib/schema";
 import { Header } from "@/apps/next-app/components/Header";
 import RoomInvitations from "@/apps/next-app/components/room-invitations";
 import { Suspense } from "react";
+import { AvatarImage } from "@radix-ui/react-avatar";
 
 export default async function ProfilePage() {
   const session = await auth.api.getSession({
@@ -83,6 +84,7 @@ export default async function ProfilePage() {
                 <CardContent className="space-y-6">
                   <div className="flex flex-col items-center gap-4">
                     <Avatar className="h-24 w-24">
+                      <AvatarImage src={session.user.image ?? ""} />
                       <AvatarFallback className="bg-primary text-3xl text-primary-foreground">
                         {initials}
                       </AvatarFallback>
