@@ -68,7 +68,7 @@ async function handleUpload(request: Request, env: Env): Promise<Response> {
 
 	await db.update(user).set({ image: imageUrl }).where(eq(user.id, userId));
 
-	console.log('Uploaded image for user:', { userId, imageUrl });
+	console.log('Uploaded image for user:', userId, imageUrl);
 
 	return new Response(JSON.stringify({ url: imageUrl }), {
 		headers: { 'Content-Type': 'application/json' },
