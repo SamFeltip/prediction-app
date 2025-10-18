@@ -2,6 +2,7 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "odd-snowflake-5c79",
 	"main": "src/index.ts",
+	"preview_urls": false,
 	"compatibility_date": "2025-10-11",
 	"observability": {
 		"enabled": true
@@ -11,8 +12,7 @@
 	},
 	"send_email": [
 		{
-			"name": "EMAIL",
-			"destination_address": "predict@samfelton.com"
+			"name": "EMAIL"
 		}
 	]
 }

@@ -18,12 +18,14 @@ export const auth = betterAuth({
 
     sendVerificationEmail: async ({ user, url, token }, request) => {
       if (user.email.indexOf("@example.com") !== -1) {
-        console.log("Skipping email for example.com address:", user.email);
+        console.log("Sending email to test email, instead of:", user.email);
 
-        await authClient.verifyEmail({
-          query: {
-            token,
-          },
+        await sendEmail({
+          id: user.id,
+          email: "sf.samfelton@icloud.com",
+          url,
+          token,
+          request,
         });
 
         return;
