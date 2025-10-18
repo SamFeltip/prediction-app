@@ -26,6 +26,6 @@ export default {
 		const res = await db.select().from(user).where(eq(user.id, userId)).limit(1);
 		const u = res[0];
 
-		return Response.json({ hello: u.name });
+		return Response.json({ hello: u.name, email: u.email });
 	},
 } satisfies ExportedHandler<Env>;
