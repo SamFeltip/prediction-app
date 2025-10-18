@@ -2,6 +2,7 @@
 
 import { rooms } from "@/lib/schema";
 import { InferSelectModel } from "drizzle-orm";
+import { Check, Cross, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -40,20 +41,26 @@ export function InviteItem({
       <span>
         Invited to <b>{room.title}</b>
       </span>
-      <div className="space-x-2">
+      <div className="flex gap-2">
         <button
           className="bg-green-600 text-white px-3 py-1 rounded"
           disabled={actionLoading === invite.id}
           onClick={() => handleAction(invite.id, "accept")}
         >
-          Accept
+          <span className="inline-block lg:hidden">Accept</span>
+          <span className="hidden lg:inline-block">
+            <Check className="inline-block h-4 w-4" />
+          </span>
         </button>
         <button
           className="bg-red-600 text-white px-3 py-1 rounded"
           disabled={actionLoading === invite.id}
           onClick={() => handleAction(invite.id, "deny")}
         >
-          Deny
+          <span className="inline-block lg:hidden">Deny</span>
+          <span className="hidden lg:inline-block">
+            <X className="inline-block h-4 w-4" />
+          </span>
         </button>
       </div>
     </>
