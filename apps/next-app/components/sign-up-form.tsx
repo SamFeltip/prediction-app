@@ -38,7 +38,7 @@ export function SignUpForm() {
       // setError("Failed to create account. Email may already be in use.");
     }
 
-    redirect("/");
+    redirect("/verify");
   }
 
   return (
