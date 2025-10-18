@@ -12,7 +12,7 @@ import {
 import { Button } from "@/apps/next-app/components/ui/button";
 import { AlertCircle, CheckCircle, XCircle } from "lucide-react";
 import { useSession } from "@/apps/next-app/lib/auth-client";
-import { markets } from "@/apps/next-app/lib/schema";
+import { markets } from "@lib/schema";
 import { InferSelectModel } from "drizzle-orm";
 import { MarketWithBets } from "@/apps/next-app/lib/betting/betCounts";
 

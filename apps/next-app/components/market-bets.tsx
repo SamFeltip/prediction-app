@@ -8,7 +8,7 @@ import {
 import { Avatar, AvatarFallback } from "@/apps/next-app/components/ui/avatar";
 import { Badge } from "@/apps/next-app/components/ui/badge";
 import { eq } from "drizzle-orm";
-import { answers, bets, user } from "@/apps/next-app/lib/schema";
+import { answers, bets, user } from "@lib/schema";
 
 interface MarketBetsProps {
   marketId: number;

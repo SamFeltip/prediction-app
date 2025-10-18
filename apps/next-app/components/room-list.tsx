@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { db } from "@/apps/next-app/lib/db";
 import { auth } from "@/apps/next-app/lib/auth";
-import { userRooms, rooms } from "@/apps/next-app/lib/schema";
+import { userRooms, rooms } from "@lib/schema";
 import { eq, and } from "drizzle-orm";
 
 import { headers } from "next/headers";

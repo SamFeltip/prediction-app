@@ -4,7 +4,7 @@ import {
   MarketWithBetCount,
 } from "@/apps/next-app/components/market-card";
 import { count, eq } from "drizzle-orm";
-import { markets, bets, answers } from "@/apps/next-app/lib/schema";
+import { markets, bets, answers } from "@lib/schema";
 
 type MarketListProps = {
   roomId: number;

@@ -14,7 +14,7 @@ import { Coins, TrendingUp, Trophy, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/apps/next-app/components/ui/button";
 import { eq } from "drizzle-orm";
-import { userPoints, bets, markets, answers } from "@/apps/next-app/lib/schema";
+import { userPoints, bets, markets, answers } from "@lib/schema";
 import { Header } from "@/apps/next-app/components/Header";
 import RoomInvitations from "@/apps/next-app/components/room-invitations";
 import { Suspense } from "react";

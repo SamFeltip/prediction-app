@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { db } from "@/apps/next-app/lib/db";
 import { auth } from "@/apps/next-app/lib/auth";
-import { rooms, userRooms } from "@/apps/next-app/lib/schema";
+import { rooms, userRooms } from "@lib/schema";
 
 // POST: create a new room
 export async function POST(req: Request) {

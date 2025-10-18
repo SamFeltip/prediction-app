@@ -7,7 +7,7 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 import { useRouter } from "next/navigation";
-import { markets } from "@/apps/next-app/lib/schema";
+import { markets } from "@lib/schema";
 import { InferSelectModel } from "drizzle-orm";
 import { DeleteMarketButton } from "./delete-market-button";
 

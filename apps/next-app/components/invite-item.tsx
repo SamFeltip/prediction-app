@@ -1,6 +1,6 @@
 "use client";
 
-import { rooms } from "@/apps/next-app/lib/schema";
+import { rooms } from "@lib/schema";
 import { InferSelectModel } from "drizzle-orm";
 import { Check, Cross, X } from "lucide-react";
 import { useRouter } from "next/navigation";

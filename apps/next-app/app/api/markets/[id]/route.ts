@@ -1,5 +1,5 @@
 import { db } from "@/apps/next-app/lib/db";
-import { markets } from "@/apps/next-app/lib/schema";
+import { markets } from "@lib/schema";
 import { eq } from "drizzle-orm";
 import { auth } from "@/apps/next-app/lib/auth";
 import { NextResponse } from "next/server";

@@ -24,14 +24,31 @@ export function SignInForm() {
     const password = formData.get("password") as string;
 
     try {
-      await signIn.email({
-        email,
-        password,
-      });
-      router.push("/");
-      router.refresh();
+      await signIn.email(
+        {
+          email,
+          password,
+        },
+        {
+          onError: (ctx) => {
+            console.error(ctx.error);
+            if (ctx.error.status === 403) {
+              setError("Please verify your email address");
+            } else {
+              setError("Invalid email or password");
+            }
+            setLoading(false);
+          },
+          onSuccess: () => {
+            setLoading(false);
+            router.push("/");
+            router.refresh();
+          },
+        }
+      );
     } catch (err) {
-      setError("Invalid email or password");
+      console.error(err);
+      setError("An unexpected error occurred");
     } finally {
       setLoading(false);
     }

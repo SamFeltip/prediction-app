@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { InviteItem } from "./invite-item";
 import { db } from "@/apps/next-app/lib/db";
-import { rooms, userRooms } from "@/apps/next-app/lib/schema";
+import { rooms, userRooms } from "@lib/schema";
 import { auth } from "@/apps/next-app/lib/auth";
 import { headers } from "next/headers";
 import { eq, and } from "drizzle-orm";

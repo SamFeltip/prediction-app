@@ -10,7 +10,7 @@ import { Button } from "@/apps/next-app/components/ui/button";
 import { Badge } from "@/apps/next-app/components/ui/badge";
 import { Calendar, TrendingUp, Users } from "lucide-react";
 import Link from "next/link";
-import { markets, bets, answers } from "@/apps/next-app/lib/schema";
+import { markets, bets, answers } from "@lib/schema";
 import { InferSelectModel } from "drizzle-orm";
 import { MarketWithBets } from "@/apps/next-app/lib/betting/betCounts";
 import { AnswerBar } from "./answer-bar";

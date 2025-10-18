@@ -3,7 +3,7 @@ import { db } from "@/apps/next-app/lib/db";
 import { auth } from "@/apps/next-app/lib/auth";
 import { headers } from "next/headers";
 import { eq } from "drizzle-orm";
-import { userPoints } from "@/apps/next-app/lib/schema";
+import { userPoints } from "@lib/schema";
 
 export async function GET() {
   try {

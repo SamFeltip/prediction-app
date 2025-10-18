@@ -4,7 +4,7 @@ import InviteUserForm from "@/apps/next-app/components/invite-user-form";
 import { MarketList } from "@/apps/next-app/components/market-list";
 import { auth } from "@/apps/next-app/lib/auth";
 import { db } from "@/apps/next-app/lib/db";
-import { rooms, userRooms } from "@/apps/next-app/lib/schema";
+import { rooms, userRooms } from "@lib/schema";
 import { eq, and } from "drizzle-orm";
 
 import { headers } from "next/headers";

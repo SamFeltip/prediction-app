@@ -3,7 +3,7 @@ import { db } from "@/apps/next-app/lib/db";
 import { auth } from "@/apps/next-app/lib/auth";
 import { headers } from "next/headers";
 import { and, countDistinct, eq, isNull, sum } from "drizzle-orm";
-import { markets, bets, answers } from "@/apps/next-app/lib/schema";
+import { markets, bets, answers } from "@lib/schema";
 import { sql } from "drizzle-orm";
 
 // export async function GET() {

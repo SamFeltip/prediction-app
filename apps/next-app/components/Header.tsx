@@ -3,7 +3,7 @@ import { TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { and, count, eq } from "drizzle-orm";
 import { db } from "@/apps/next-app/lib/db";
-import { userRooms } from "@/apps/next-app/lib/schema";
+import { userRooms } from "@lib/schema";
 import { auth } from "@/apps/next-app/lib/auth";
 import { headers } from "next/headers";
 import { Suspense } from "react";

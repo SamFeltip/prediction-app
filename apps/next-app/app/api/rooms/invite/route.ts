@@ -1,6 +1,6 @@
 import { db } from "@/apps/next-app/lib/db";
 import { auth } from "@/apps/next-app/lib/auth";
-import { user, userRooms } from "@/apps/next-app/lib/schema";
+import { user, userRooms } from "@/apps/packages/lib/schema";
 import { eq, like } from "drizzle-orm";
 import { NextResponse } from "next/server";
 

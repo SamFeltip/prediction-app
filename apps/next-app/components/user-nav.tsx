@@ -5,7 +5,7 @@ import { UserDropdown } from "./user-dropdown";
 import { headers } from "next/headers";
 import { auth } from "@/apps/next-app/lib/auth";
 import { db } from "@/apps/next-app/lib/db";
-import { userRooms } from "@/apps/next-app/lib/schema";
+import { userRooms } from "@lib/schema";
 import { count } from "console";
 import { and, eq } from "drizzle-orm";
 

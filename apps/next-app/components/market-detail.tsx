@@ -6,7 +6,7 @@ import {
 } from "@/apps/next-app/components/ui/card";
 import { Calendar, TrendingUp, Users } from "lucide-react";
 import { Badge } from "@/apps/next-app/components/ui/badge";
-import { markets } from "@/apps/next-app/lib/schema";
+import { markets } from "@lib/schema";
 import { InferSelectModel } from "drizzle-orm";
 import { MarketWithBets } from "@/apps/next-app/lib/betting/betCounts";
 import { AnswerBar } from "./answer-bar";

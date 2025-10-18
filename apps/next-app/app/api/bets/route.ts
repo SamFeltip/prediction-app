@@ -3,7 +3,7 @@ import { db } from "@/apps/next-app/lib/db";
 import { auth } from "@/apps/next-app/lib/auth";
 import { headers } from "next/headers";
 import { and, eq } from "drizzle-orm";
-import { markets, bets, userPoints, answers } from "@/apps/next-app/lib/schema";
+import { markets, bets, userPoints, answers } from "@lib/schema";
 
 export async function POST(request: NextRequest) {
   try {

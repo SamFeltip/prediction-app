@@ -15,7 +15,7 @@ import { useSession } from "@/apps/next-app/lib/auth-client";
 import { Coins } from "lucide-react";
 import useSWR from "swr";
 import { InferSelectModel } from "drizzle-orm";
-import { markets } from "@/apps/next-app/lib/schema";
+import { markets } from "@lib/schema";
 import { MarketWithBets } from "@/apps/next-app/lib/betting/betCounts";
 
 export function BettingInterface({ market }: { market: MarketWithBets }) {
