@@ -65,7 +65,7 @@ export default async function ProfilePage() {
             <Button variant="ghost" asChild className="mb-6">
               <Link href="/">
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Wagers
+                Back to Rooms
               </Link>
             </Button>
 
