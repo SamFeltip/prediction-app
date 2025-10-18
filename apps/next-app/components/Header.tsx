@@ -14,7 +14,7 @@ export async function Header() {
     <header className="border-b border-border bg-card">
       <div className="container mx-auto flex items-center justify-between px-4 py-4">
         <div className="flex items-center gap-2">
-          <TrendingUp className="h-6 w-6 text-primary" />
+          <img src="/frame.png" className="h-7 w-7" />
           <h1 className="text-xl font-bold text-foreground">
             <Link href="/">Predict</Link>
           </h1>

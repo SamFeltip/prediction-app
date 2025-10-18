@@ -18,7 +18,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Predict - Prediction Markets",
   description: "Create and bet on wagers",
-  generator: "v0.app",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-icon.png",
+  },
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({

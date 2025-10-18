@@ -9,9 +9,9 @@ export default function SignUpPage() {
         <div className="text-center">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-2xl font-bold"
+            className="inline-flex items-center gap-1 text-2xl font-bold"
           >
-            <TrendingUp className="h-8 w-8 text-primary" />
+            <img src="/frame.png" className="h-9 w-9" />
             Predict
           </Link>
           <h2 className="mt-6 text-3xl font-bold text-foreground">

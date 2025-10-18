@@ -13,6 +13,7 @@ import {
   MarketWithBets,
 } from "@/apps/next-app/lib/betting/betCounts";
 import { Button } from "@/apps/next-app/components/ui/button";
+import Link from "next/link";
 
 interface MarketPageProps {
   params: Promise<{ id: string }>;
@@ -49,15 +50,15 @@ export default async function MarketPage({ params }: MarketPageProps) {
       <main className="container mx-auto px-4 py-4">
         <div className="min-h-screen bg-background">
           <div className="container mx-auto px-4">
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-3">
               <div>
-                <a
+                <Link
                   className="inline-block bg-primary text-white px-4 py-2 rounded"
                   href={`/rooms/${market.roomId}`}
                 >
                   <ArrowLeftCircle className="inline-block pe-2" />
                   go back to room {marketResult.rooms.title}
-                </a>
+                </Link>
               </div>
               <div className="grid gap-6 lg:grid-cols-3">
                 <div className="lg:col-span-2 space-y-6">

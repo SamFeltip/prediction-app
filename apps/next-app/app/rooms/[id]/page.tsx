@@ -56,13 +56,13 @@ export default async function RoomDetailPage({
     <>
       <Header />
       <main className="container mx-auto px-4 py-4">
-        <div className="max-w-2xl mx-auto mt-10 flex flex-col gap-2">
+        <div className="max-w-2xl mx-auto md:mt-10 flex flex-col gap-2">
           <div className="flex justify-between">
             <h2 className="text-2xl font-bold mb-4">{r.title}</h2>
             <CreateMarketButton roomId={roomId} />
           </div>
 
-          <div className="flex justify-between mb-4">
+          <div className="flex flex-col md:flex-row gap-3 justify-between mb-4">
             <div className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2">
               {userRoomResult.map((userRoom) => (
                 <Avatar

@@ -1,0 +1,41 @@
+{
+  "short_name": "Predict",
+  "name": "Predict",
+  "icons": [
+    {
+      "src": "/logo.svg",
+      "type": "image/svg+xml",
+      "sizes": "512x512"
+    },
+    {
+      "src": "/logo-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/logo-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#3b82f6",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#3b82f6",
+  "description": "Place wagers on anything.",
+  "screenshots": [
+    {
+      "src": "/screenshot-828x1974.png",
+      "type": "image/png",
+      "sizes": "828x1974",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/screenshot-1440x2840.png",
+      "type": "image/png",
+      "sizes": "1440x2840",
+      "form_factor": "wide"
+    }
+  ]
+}
