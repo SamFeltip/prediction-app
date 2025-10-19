@@ -3,39 +3,39 @@ import { db } from "@/apps/next-app/lib/db";
 import { auth } from "@/apps/next-app/lib/auth";
 import { headers } from "next/headers";
 import { and, eq } from "drizzle-orm";
-import { markets, bets, userPoints, answers } from "@lib/schema";
+import { markets, bets, answers, user } from "@lib/schema";
 
 interface RouteContext {
   params: Promise<{ id: string }>;
 }
 
 export async function POST(request: NextRequest, context: RouteContext) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { id } = await context.params;
+  const marketId = Number.parseInt(id);
+
+  if (isNaN(marketId)) {
+    return NextResponse.json({ error: "Invalid market ID" }, { status: 400 });
+  }
+
+  const body = await request.json();
+  const { answerId } = body;
+
+  if (typeof answerId !== "number") {
+    return NextResponse.json(
+      { error: "answerId must be a valid id" },
+      { status: 400 }
+    );
+  }
+
   try {
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    });
-
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const { id } = await context.params;
-    const marketId = Number.parseInt(id);
-
-    if (isNaN(marketId)) {
-      return NextResponse.json({ error: "Invalid market ID" }, { status: 400 });
-    }
-
-    const body = await request.json();
-    const { answerId } = body;
-
-    if (typeof answerId !== "number") {
-      return NextResponse.json(
-        { error: "answerId must be a valid id" },
-        { status: 400 }
-      );
-    }
-
     // Get market and verify creator
     const market = await db.query.markets.findFirst({
       where: eq(markets.id, marketId),
@@ -77,56 +77,6 @@ export async function POST(request: NextRequest, context: RouteContext) {
       );
     }
 
-    // Get all bets for this market
-    const allBets = await db.query.bets.findMany({
-      where: eq(bets.marketId, marketId),
-    });
-
-    // Calculate points distribution
-    const winningBets = allBets.filter((bet) => bet.answerId === answerId);
-    const losingBets = allBets.filter((bet) => bet.answerId !== answerId);
-
-    const totalLosingPoints = losingBets.length;
-
-    // Distribute points to winners proportionally
-    for (const bet of winningBets) {
-      const userPointsRecord = await db.query.userPoints.findFirst({
-        where: eq(userPoints.userId, bet.userId),
-      });
-
-      if (userPointsRecord === undefined) {
-        continue;
-      }
-
-      const currentPoints = userPointsRecord.points;
-
-      await db.insert(userPoints).values({
-        userId: bet.userId,
-        points: currentPoints + totalLosingPoints,
-      });
-    }
-
-    for (const bet of losingBets) {
-      const userPointsRecord = await db.query.userPoints.findFirst({
-        where: eq(userPoints.userId, bet.userId),
-      });
-
-      if (userPointsRecord === undefined) {
-        continue;
-      }
-
-      const currentPoints = userPointsRecord.points;
-
-      const companionLooserBets = losingBets.filter(
-        (b) => b.answerId === bet.answerId
-      );
-
-      await db.insert(userPoints).values({
-        userId: bet.userId,
-        points: currentPoints - companionLooserBets.length,
-      });
-    }
-
     // Mark the market as resolved
     await db
       .update(markets)
@@ -134,6 +84,40 @@ export async function POST(request: NextRequest, context: RouteContext) {
         resolvedAnswer: answerId,
       })
       .where(eq(markets.id, marketId));
+
+    // Get all bets for this market
+    const allBets = await db
+      .select()
+      .from(bets)
+      .innerJoin(user, eq(user.id, bets.userId))
+      .where(eq(bets.marketId, marketId));
+
+    // Calculate points distribution
+    const winningBets = allBets.filter((row) => row.bets.answerId === answerId);
+    const losingBets = allBets.filter((row) => row.bets.answerId !== answerId);
+
+    const totalLosingPoints = losingBets.length;
+
+    // Distribute points to winners proportionally
+    for (const row of winningBets) {
+      const currentPoints = row.user.points;
+
+      await db.update(user).set({
+        points: currentPoints + totalLosingPoints,
+      });
+    }
+
+    for (const row of losingBets) {
+      const currentPoints = row.user.points;
+
+      const companionLooserBets = losingBets.filter(
+        (b) => b.bets.answerId === row.bets.answerId
+      );
+
+      await db.update(user).set({
+        points: currentPoints - companionLooserBets.length,
+      });
+    }
 
     return NextResponse.json({ success: true, answerId });
   } catch (error) {

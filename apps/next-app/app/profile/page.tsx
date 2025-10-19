@@ -14,7 +14,7 @@ import { Coins, TrendingUp, Trophy, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/apps/next-app/components/ui/button";
 import { eq } from "drizzle-orm";
-import { userPoints, bets, markets, answers, user } from "@lib/schema";
+import { bets, markets, answers, user } from "@lib/schema";
 import { Header } from "@/apps/next-app/components/Header";
 import RoomInvitations from "@/apps/next-app/components/room-invitations";
 import { Suspense } from "react";
@@ -32,10 +32,11 @@ export default async function ProfilePage() {
   }
 
   // Get user points
-  const userPointsRecord = await db.query.userPoints.findFirst({
-    where: eq(userPoints.userId, session.user.id),
+  const userPointsRecord = await db.query.user.findFirst({
+    where: eq(user.id, session.user.id),
   });
-  const currentUserPoints = userPointsRecord?.points;
+
+  const currentUserPoints = userPointsRecord?.points ?? 0;
 
   // Get user's bets
   const userBets = await db
